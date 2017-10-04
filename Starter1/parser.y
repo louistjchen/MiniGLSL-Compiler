@@ -24,9 +24,9 @@
 #define YYERROR_VERBOSE
 #define yTRACE(x)    { if (traceParser) fprintf(traceFile, "%s\n", x); }
 
-void yyerror(char* s);    /* what to do in case of error            */
-int yylex();              /* procedure for calling lexical analyzer */
-extern int yyline;        /* variable holding current line number   */
+void yyerror(const char* s);    /* what to do in case of error            */
+int yylex();             	/* procedure for calling lexical analyzer */
+extern int yyline;        	/* variable holding current line number   */
 
 %}
 
@@ -61,7 +61,8 @@ extern int yyline;        /* variable holding current line number   */
 }
 // TODO:Replace myToken with your tokens, you can use these tokens in flex
 // Variable-type tokens. Refer to "MiniGLSL language description.pdf" variable section
-%token		INT_TYPE FLOAT_TYPE BOOL_TYPE VEC2_TYPE VEC3_TYPE VEC4_TYPE
+%token		WHITE_SPACE
+%token		CONST INT_TYPE FLOAT_TYPE BOOL_TYPE VEC2_TYPE VEC3_TYPE VEC4_TYPE
 %token		BVEC2_TYPE BVEC3_TYPE BVEC4_TYPE IVEC2_TYPE IVEC3_TYPE IVEC4_TYPE
 
 // Sign-type tokens. Refer to "MiniGLSL language description.pdf" scope section
@@ -79,10 +80,14 @@ extern int yyline;        /* variable holding current line number   */
 %token		SEMICOLON COMMA
 %token		IF ELSE FOR WHILE DO
 %token		STAR_COMMENT SLASH_COMMENT
-%token		IDENTIFIER INT_EXP FLOAT_EXP
+%token		INCLUDE DEFINE
 
 // Function token
 %token		FUNCTION
+%token		RETURN
+
+%token		IDENTIFIER INT_EXP FLOAT_EXP
+
 
 %token 		myToken1 myToken2
 
@@ -121,7 +126,7 @@ token
  * The given yyerror function should not be touched. You may add helper
  * functions as necessary in subsequent phases.
  ***********************************************************************/
-void yyerror(char* s) {
+void yyerror(const char* s) {
   if (errorOccurred)
     return;    /* Error has already been reported by scanner */
   else

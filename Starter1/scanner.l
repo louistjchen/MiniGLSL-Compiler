@@ -10,6 +10,8 @@
 #include "common.h"
 #include "parser.tab.h"
 #include "string.h"
+#include <limits.h>
+#include <float.h>
 
 
 #define YY_USER_INIT { yyin = inputFile; }
@@ -28,18 +30,22 @@ int processLit(char *yytext, int tokenKind);
 %}
 %option noyywrap
 
-WS		[ \t]
+WS		[ \t\n\r]
+SIGN		[+-]
 DIG		[0-9]
 DIGs		{DIG}+
 CHAR		[a-zA-Z_]
 DIGorCHAR	{DIG}|{CHAR}
 
-INTs		{DIGs}
-FLOATs		{DIGs}"."{DIGs}
+INTs		{SIGN}?{DIGs}
+FLOATs		{SIGN}?({DIGs}"."|"."{DIGs}|{DIGs}"."{DIGs})
 IDs		{CHAR}{DIGorCHAR}*
 
 %%
 
+{WS}		{								}
+
+"const"		{	yTRACE(CONST);			return CONST;		}
 "int"		{	yTRACE(INT_TYPE); 		return INT_TYPE;	}
 "float"		{	yTRACE(FLOAT_TYPE); 		return FLOAT_TYPE;	}
 "bool"		{	yTRACE(BOOL_TYPE);		return BOOL_TYPE;	}
@@ -90,13 +96,17 @@ IDs		{CHAR}{DIGorCHAR}*
 "do"		{	yTRACE(DO);			return DO;		}
 "/*"        	{	processStarComment();		return STAR_COMMENT;	}
 "//"        	{	processSlashComment();		return SLASH_COMMENT;	}
-IDs		{	processID(yytext, IDENTIFIER);	return IDENTIFIER;	}
-INTs		{	processLit(yytext, INT_EXP);	return INT_EXP;		}
-FLOATs		{	processLit(yytext, FLOAT_EXP);	return FLOAT_EXP;	}
+"#include"	{	yTRACE(INCLUDE);		return INCLUDE;		}
+"#define"	{	yTRACE(DEFINE);			return DEFINE;		}
 
 "lit"		{	processID(yytext, FUNCTION);	return FUNCTION;	}
 "dp3"		{	processID(yytext, FUNCTION);	return FUNCTION;	}
 "rsq"		{	processID(yytext, FUNCTION);	return FUNCTION;	}
+"return"	{	yTRACE(RETURN);			return RETURN;		}
+
+{IDs}		{	processID(yytext, IDENTIFIER);	return IDENTIFIER;	}
+{INTs}		{	processLit(yytext, INT_EXP);	return INT_EXP;		}
+{FLOATs}	{	processLit(yytext, FLOAT_EXP);	return FLOAT_EXP;	}
 
 .           	{	yERROR("Unknown token");				}
 
@@ -149,8 +159,18 @@ int processID(char *yytext, int tokenKind) {
 int processLit(char *yytext, int tokenKind) {
 
 	if(tokenKind == INT_EXP) {;
+		long int num = (long int) atof(yytext);
+		if(num > INT_MAX || num < INT_MIN)
+			yERROR("integer exceeds the range from -2147483648 to +2147483647");
+		yylval.num_int = num;
+		yTRACE(tokenKind);
 	}
-	else {;
+	else {
+		double num = atof(yytext);
+		if(num > FLT_MAX || num < -FLT_MAX)
+			yERROR("float exceeds the range from -1e37 to +1e37");
+		yylval.num_float = num;
+		yTRACE(tokenKind);
 	}
 	return 0;
 }
