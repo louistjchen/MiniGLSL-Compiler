@@ -1,6 +1,8 @@
 %{
 /***********************************************************************
- * --YOUR GROUP INFO SHOULD GO HERE--
+ * 
+ * Louis Chen - 1000303502
+ * Juntu Chen - 1000659799
  * 
  *   Interface to the parser module for CSC467 course project.
  * 
@@ -54,6 +56,7 @@ extern int yyline;        	/* variable holding current line number   */
 // TODO:Modify me to add more data types
 // Can access me from flex useing yyval
 
+// the team added num_float and str to store float numbers and strings
 %union {
 	int num_int;
 	float num_float;
@@ -86,9 +89,10 @@ extern int yyline;        	/* variable holding current line number   */
 %token		FUNCTION
 %token		RETURN
 
+// Identifier, int, float tokes
 %token		IDENTIFIER INT_EXP FLOAT_EXP
 
-
+// this is remained for compilation use. Will be removed in the next phase
 %token 		myToken1 myToken2
 
 %start    program

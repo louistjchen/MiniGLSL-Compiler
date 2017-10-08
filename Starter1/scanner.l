@@ -1,7 +1,8 @@
 %{
 /**********************************************************************
  *
- * **YOUR GROUP INFO SHOULD GO HERE**
+ * Louis Chen - 1000303502
+ * Juntu Chen - 1000659799
  *
  *  Interface to the scanner module for CSC467 course project
  **********************************************************************/
@@ -10,6 +11,7 @@
 #include "common.h"
 #include "parser.tab.h"
 #include "string.h"
+// include <limits.h> and <float.h> for standard macro definitions (INT_MAX, FLOAT_MAX, etc.)
 #include <limits.h>
 #include <float.h>
 
@@ -21,6 +23,7 @@
 
 int CheckInt(void);
 int yyline = 1;
+// function prototypes for dealing with specific input patterns
 int processStarComment();
 int processSlashComment();
 int processID(char *yytext, int tokenKind);
@@ -112,6 +115,7 @@ IDs		{CHAR}{DIGorCHAR}*
 
 %%
 
+// function that processes /**/
 int processStarComment() {
 
 	int c1      = 0;
@@ -133,6 +137,7 @@ int processStarComment() {
 	return 0;
 }
 
+// function that processes //
 int processSlashComment() {
 
 	int c1      = yyinput();
@@ -146,27 +151,35 @@ int processSlashComment() {
 	return 0;
 }
 
+// function that processes an identifier
 int processID(char *yytext, int tokenKind) {
 
+	// max identifier length check
 	if(strlen(yytext) > MAX_IDENTIFIER)
 		yERROR("identifier name exceeds 32 characters");
+	// malloc for identifier string space
 	yylval.str = (char *) malloc( sizeof(char) * (strlen(yytext)+1) );
 	strcpy(yylval.str, yytext);
 	yTRACE(tokenKind);
 	return 0;
 }
 
+// funtion that processes a number (integer or float)
 int processLit(char *yytext, int tokenKind) {
 
-	if(tokenKind == INT_EXP) {;
+	// integer
+	if(tokenKind == INT_EXP) {
 		long int num = (long int) atof(yytext);
+		// integer bound check
 		if(num > INT_MAX || num < INT_MIN)
 			yERROR("integer exceeds the range from -2147483648 to +2147483647");
 		yylval.num_int = num;
 		yTRACE(tokenKind);
 	}
+	// float
 	else {
 		double num = atof(yytext);
+		// float bound check
 		if(num > FLT_MAX || num < -FLT_MAX)
 			yERROR("float exceeds the range from -1e37 to +1e37");
 		yylval.num_float = num;
