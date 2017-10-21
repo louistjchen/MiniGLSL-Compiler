@@ -82,9 +82,12 @@ enum {
 %token <as_vec>   IVEC_T
 %token <as_float> FLOAT_C
 %token <as_int>   INT_C
+// linked as_func to FUNC
 %token <as_func>  FUNC
 %token <as_str>   ID
 
+// modified '|' and '&' to OR and AND
+// added precedency for '[' ']' '(' ')'
 %left     OR
 %left	  AND
 %left     '&'
@@ -107,6 +110,8 @@ enum {
  *       language grammar
  *    2. Implement the trace parser option of the compiler
  ***********************************************************************/
+
+/* rewrote production rules lists in the handout to here */
 
 program
 	:	scope
