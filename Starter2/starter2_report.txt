@@ -1,0 +1,16 @@
+This is a summary document on how the team came up to the lab solution
+
+GROUP 25
+
+Louis Chen - 1000303502
+Juntu Chen - 1000659799
+
+1) went through the lab handout, and figured the need to copy given production rules to parser.y in appropriate format.
+
+2) modified some operator precedences in the corresponding section
+
+3) ran test program to see if there's any error
+
+This lab is relatively more straight forward comparing to Starter1, as it only checks whether the tokens converted by scanner.l have satisfied the predefined production rules. The team noticed parser stops parsing and scanner stops tokenizing as soon as parser sees an unmatched/undefined production rule.
+
+test program, test.c, is included under folder test_case.

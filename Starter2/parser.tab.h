@@ -51,21 +51,21 @@ extern int yydebug;
     CONST = 261,
     FALSE_C = 262,
     TRUE_C = 263,
-    FUNC = 264,
-    IF = 265,
-    WHILE = 266,
-    ELSE = 267,
-    AND = 268,
-    OR = 269,
-    NEQ = 270,
-    EQ = 271,
-    LEQ = 272,
-    GEQ = 273,
-    VEC_T = 274,
-    BVEC_T = 275,
-    IVEC_T = 276,
-    FLOAT_C = 277,
-    INT_C = 278,
+    IF = 264,
+    WHILE = 265,
+    ELSE = 266,
+    AND = 267,
+    OR = 268,
+    NEQ = 269,
+    EQ = 270,
+    LEQ = 271,
+    GEQ = 272,
+    VEC_T = 273,
+    BVEC_T = 274,
+    IVEC_T = 275,
+    FLOAT_C = 276,
+    INT_C = 277,
+    FUNC = 278,
     ID = 279,
     UMINUS = 280
   };
@@ -77,21 +77,21 @@ extern int yydebug;
 #define CONST 261
 #define FALSE_C 262
 #define TRUE_C 263
-#define FUNC 264
-#define IF 265
-#define WHILE 266
-#define ELSE 267
-#define AND 268
-#define OR 269
-#define NEQ 270
-#define EQ 271
-#define LEQ 272
-#define GEQ 273
-#define VEC_T 274
-#define BVEC_T 275
-#define IVEC_T 276
-#define FLOAT_C 277
-#define INT_C 278
+#define IF 264
+#define WHILE 265
+#define ELSE 266
+#define AND 267
+#define OR 268
+#define NEQ 269
+#define EQ 270
+#define LEQ 271
+#define GEQ 272
+#define VEC_T 273
+#define BVEC_T 274
+#define IVEC_T 275
+#define FLOAT_C 276
+#define INT_C 277
+#define FUNC 278
 #define ID 279
 #define UMINUS 280
 
@@ -100,7 +100,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 60 "parser.y" /* yacc.c:1909  */
+#line 63 "parser.y" /* yacc.c:1909  */
 
   int as_int;
   int as_vec;
