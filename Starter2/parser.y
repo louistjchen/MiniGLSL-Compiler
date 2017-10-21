@@ -114,78 +114,80 @@ enum {
 /* rewrote production rules lists in the handout to here */
 
 program
-	:	scope
+	:	scope							{ yTRACE("program -> scope"); }
 	;
 
 scope
-	:	'{' declarations statements '}'
+	:	'{' declarations statements '}'				{ yTRACE("scope -> '{' declarations statements '}'"); }
 	;
 declarations
-	:	declarations declaration
-	|	/* epsilon */
+	:	declarations declaration				{ yTRACE("declarations -> declarations declaration"); }
+	|	/* epsilon */						{ yTRACE("declarations -> epsilon"); }
+
 	;
 statements
-	:	statements statement
-	|	/* epsilon */
+	:	statements statement					{ yTRACE("statements -> statements statement"); }
+	|	/* epsilon */						{ yTRACE("statements -> epsilon"); }
 	;
 declaration
-	:	type ID ';'
-	|	type ID '=' expression ';'
-	|	CONST type ID '=' expression ';'
-	|	/* epsilon */
+	:	type ID ';'						{ yTRACE("declaration -> type ID ';'"); }
+	|	type ID '=' expression ';'				{ yTRACE("declaration -> type ID '=' expression ';'"); }
+	|	CONST type ID '=' expression ';'			{ yTRACE("declaration -> CONST type ID '=' expression ';'"); }
+	|	/* epsilon */						{ yTRACE("declaration -> epsilon"); }
 	;
 statement
-	:	variable '=' expression ';'
-	|	IF '(' expression ')' statement else_statement
-	|	WHILE '(' expression ')' statement
-	|	scope
-	|	';'
+	:	variable '=' expression ';'				{ yTRACE("statement -> variable '=' expression ';'"); }
+	|	IF '(' expression ')' statement else_statement		{ yTRACE("statement -> IF '(' expression ')' statement else_statement"); }
+	|	WHILE '(' expression ')' statement			{ yTRACE("statement -> WHILE '(' expression ')' statement"); }
+	|	scope							{ yTRACE("statement -> scope"); }
+	|	';'							{ yTRACE("statement -> ';'"); }
 	;
 else_statement
-	:	ELSE statement
-	|	/* epsilon */
+	:	ELSE statement						{ yTRACE("else_statement -> ELSE statement"); }
+	|	/* epsilon */						{ yTRACE("else_statement -> epsilon"); }
 	;
 type
-	:	INT_T | IVEC_T
-	|	BOOL_T | BVEC_T
-	|	FLOAT_T | VEC_T
+	:	INT_T { yTRACE("type -> INT_T"); } | IVEC_T { yTRACE("type -> IVEC_T"); }
+	|	BOOL_T { yTRACE("type -> BOOL_T"); } | BVEC_T{ yTRACE("type -> BVEC_T"); }
+	|	FLOAT_T { yTRACE("type -> FLOAT_T"); } | VEC_T{ yTRACE("type -> VEC_T"); }
 	;
 expression
-	:	constructor
-	|	function
-	|	INT_C
-	|	FLOAT_C
-	|	variable
-	|	unary_op expression
-	|	expression binary_op expression { yTRACE("YOYO expression -> expression binary_op expression"); }
-	|	TRUE_C | FALSE_C
-	|	'(' expression ')'
+	:	constructor						{ yTRACE("expression -> constructor"); }
+	|	function						{ yTRACE("expression -> function"); }
+	|	INT_C							{ yTRACE("expression -> INT_C"); }
+	|	FLOAT_C							{ yTRACE("expression -> FLOAT_C"); }
+	|	variable						{ yTRACE("expression -> variable"); }
+	|	unary_op expression					{ yTRACE("expression -> unary_op expression"); }
+	|	expression binary_op expression				{ yTRACE("expression -> expression binary_op expression"); }
+	|	TRUE_C { yTRACE("expression -> TRUE_C"); } | FALSE_C { yTRACE("expression -> FALSE_C"); }
+	|	'(' expression ')'					{ yTRACE("expression -> '(' expression ')'"); }
 	;
 variable
-	:	ID
-	|	ID '[' INT_C ']'
+	:	ID							{ yTRACE("variable -> ID"); }
+	|	ID '[' INT_C ']'					{ yTRACE("variable -> ID '[' INT_C ']'"); }
 	;
 unary_op
-	:	'!'
-	|	'-' %prec UMINUS
+	:	'!'							{ yTRACE("unary_op -> '!'"); }
+	|	'-' %prec UMINUS					{ yTRACE("unary_op -> UMINUS"); }
 	;
 binary_op
-	:	AND | OR | EQ | NEQ | '<' | LEQ
-	|	'>' | GEQ | '+' | '-' | '*' | '/' | '^'
+	:	AND { yTRACE("binary_op -> AND"); } | OR { yTRACE("binary_op -> OR"); } | EQ { yTRACE("binary_op -> EQ"); } | NEQ { yTRACE("binary_op -> NEQ"); }
+	| 	'<' { yTRACE("binary_op -> '<'"); } | LEQ { yTRACE("binary_op -> LEQ"); } | '>' { yTRACE("binary_op -> '>'"); } | GEQ { yTRACE("binary_op -> GEQ"); }
+	| 	'+' { yTRACE("binary_op -> '+'"); } | '-' { yTRACE("binary_op -> '-'"); } | '*' { yTRACE("binary_op -> '*'"); } | '/' { yTRACE("binary_op -> '/'"); } | '^'{ yTRACE("binary_op -> '^'"); }
 	;
 constructor
-	:	type '(' arguments ')'
+	:	type '(' arguments ')'					{ yTRACE("constructor -> type '(' arguments ')'"); }
 	;
 function
-	:	FUNC '(' arguments_opt ')'
+	:	FUNC '(' arguments_opt ')'				{ yTRACE("function -> FUNC '(' arguments_opt ')'"); }
 	;
 arguments_opt
-	:	arguments
-	|	/* epsilon */
+	:	arguments						{ yTRACE("arguments_opt -> arguments"); }
+	|	/* epsilon */						{ yTRACE("arguments_opt -> epsilon"); }
 	;
 arguments
-	:	arguments ',' expression
-	|	expression
+	:	arguments ',' expression				{ yTRACE("arguments -> arguments '.' expression"); }
+	|	expression						{ yTRACE("arguments -> expression"); }
 	;
 
 %%

@@ -1,16 +1,270 @@
-YOYO expression -> expression binary_op expression
-YOYO expression -> expression binary_op expression
-YOYO expression -> expression binary_op expression
-YOYO expression -> expression binary_op expression
-YOYO expression -> expression binary_op expression
-YOYO expression -> expression binary_op expression
-YOYO expression -> expression binary_op expression
-YOYO expression -> expression binary_op expression
-YOYO expression -> expression binary_op expression
-YOYO expression -> expression binary_op expression
-YOYO expression -> expression binary_op expression
-YOYO expression -> expression binary_op expression
-YOYO expression -> expression binary_op expression
-YOYO expression -> expression binary_op expression
-YOYO expression -> expression binary_op expression
-YOYO expression -> expression binary_op expression
+declarations -> epsilon
+type -> INT_T
+declaration -> type ID ';'
+declarations -> declarations declaration
+type -> INT_T
+declaration -> type ID ';'
+declarations -> declarations declaration
+type -> INT_T
+declaration -> type ID ';'
+declarations -> declarations declaration
+type -> BOOL_T
+declaration -> type ID ';'
+declarations -> declarations declaration
+type -> VEC_T
+declaration -> type ID ';'
+declarations -> declarations declaration
+type -> VEC_T
+type -> VEC_T
+expression -> FLOAT_C
+arguments -> expression
+expression -> FLOAT_C
+arguments -> arguments '.' expression
+constructor -> type '(' arguments ')'
+expression -> constructor
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> VEC_T
+type -> VEC_T
+expression -> INT_C
+arguments -> expression
+expression -> INT_C
+arguments -> arguments '.' expression
+constructor -> type '(' arguments ')'
+expression -> constructor
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> BVEC_T
+type -> BVEC_T
+expression -> TRUE_C
+arguments -> expression
+expression -> FALSE_C
+arguments -> arguments '.' expression
+expression -> TRUE_C
+arguments -> arguments '.' expression
+expression -> TRUE_C
+arguments -> arguments '.' expression
+constructor -> type '(' arguments ')'
+expression -> constructor
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> IVEC_T
+type -> IVEC_T
+expression -> INT_C
+arguments -> expression
+expression -> INT_C
+arguments -> arguments '.' expression
+expression -> INT_C
+arguments -> arguments '.' expression
+expression -> INT_C
+arguments -> arguments '.' expression
+constructor -> type '(' arguments ')'
+expression -> constructor
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> INT_T
+variable -> ID '[' INT_C ']'
+expression -> variable
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> INT_T
+type -> INT_T
+expression -> INT_C
+arguments -> expression
+expression -> INT_C
+arguments -> arguments '.' expression
+expression -> INT_C
+arguments -> arguments '.' expression
+constructor -> type '(' arguments ')'
+expression -> constructor
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> INT_T
+expression -> FLOAT_C
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> INT_T
+expression -> INT_C
+binary_op -> '*'
+expression -> INT_C
+binary_op -> '+'
+expression -> INT_C
+expression -> expression binary_op expression
+expression -> '(' expression ')'
+expression -> expression binary_op expression
+declaration -> CONST type ID '=' expression ';'
+declarations -> declarations declaration
+statements -> epsilon
+variable -> ID
+variable -> ID
+expression -> variable
+binary_op -> '*'
+variable -> ID
+expression -> variable
+expression -> expression binary_op expression
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+binary_op -> '+'
+expression -> INT_C
+binary_op -> '*'
+expression -> INT_C
+binary_op -> '/'
+expression -> INT_C
+expression -> expression binary_op expression
+expression -> expression binary_op expression
+expression -> '(' expression ')'
+binary_op -> '*'
+variable -> ID
+expression -> variable
+binary_op -> '*'
+unary_op -> '!'
+variable -> ID
+expression -> variable
+binary_op -> '-'
+expression -> INT_C
+binary_op -> '-'
+expression -> INT_C
+binary_op -> '-'
+expression -> INT_C
+binary_op -> '*'
+expression -> INT_C
+expression -> '(' expression ')'
+expression -> expression binary_op expression
+expression -> expression binary_op expression
+expression -> expression binary_op expression
+expression -> expression binary_op expression
+expression -> unary_op expression
+expression -> expression binary_op expression
+expression -> expression binary_op expression
+expression -> expression binary_op expression
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> variable
+binary_op -> EQ
+expression -> INT_C
+expression -> expression binary_op expression
+declarations -> epsilon
+statements -> epsilon
+variable -> ID
+expression -> INT_C
+binary_op -> '+'
+expression -> INT_C
+expression -> expression binary_op expression
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> variable
+binary_op -> EQ
+unary_op -> UMINUS
+expression -> INT_C
+expression -> unary_op expression
+expression -> expression binary_op expression
+variable -> ID
+expression -> INT_C
+statement -> variable '=' expression ';'
+variable -> ID
+expression -> INT_C
+statement -> variable '=' expression ';'
+else_statement -> ELSE statement
+statement -> IF '(' expression ')' statement else_statement
+statements -> statements statement
+scope -> '{' declarations statements '}'
+statement -> scope
+else_statement -> epsilon
+statement -> IF '(' expression ')' statement else_statement
+statements -> statements statement
+expression -> TRUE_C
+declarations -> epsilon
+statements -> epsilon
+expression -> FALSE_C
+declarations -> epsilon
+statements -> epsilon
+expression -> FALSE_C
+declarations -> epsilon
+statements -> epsilon
+variable -> ID
+variable -> ID
+expression -> variable
+statement -> variable '=' expression ';'
+statements -> statements statement
+scope -> '{' declarations statements '}'
+statement -> scope
+declarations -> epsilon
+statements -> epsilon
+variable -> ID
+expression -> INT_C
+statement -> variable '=' expression ';'
+statements -> statements statement
+scope -> '{' declarations statements '}'
+statement -> scope
+else_statement -> ELSE statement
+statement -> IF '(' expression ')' statement else_statement
+statements -> statements statement
+scope -> '{' declarations statements '}'
+statement -> scope
+declarations -> epsilon
+statements -> epsilon
+scope -> '{' declarations statements '}'
+statement -> scope
+else_statement -> ELSE statement
+statement -> IF '(' expression ')' statement else_statement
+statements -> statements statement
+scope -> '{' declarations statements '}'
+statement -> scope
+else_statement -> epsilon
+statement -> IF '(' expression ')' statement else_statement
+statements -> statements statement
+expression -> INT_C
+arguments -> expression
+expression -> INT_C
+arguments -> arguments '.' expression
+expression -> INT_C
+arguments -> arguments '.' expression
+variable -> ID
+expression -> variable
+arguments -> arguments '.' expression
+variable -> ID
+expression -> variable
+arguments -> arguments '.' expression
+arguments_opt -> arguments
+function -> FUNC '(' arguments_opt ')'
+expression -> function
+declarations -> epsilon
+statements -> epsilon
+variable -> ID
+expression -> variable
+binary_op -> EQ
+expression -> INT_C
+expression -> expression binary_op expression
+declarations -> epsilon
+statements -> epsilon
+scope -> '{' declarations statements '}'
+statement -> scope
+declarations -> epsilon
+statements -> epsilon
+expression -> FALSE_C
+declarations -> epsilon
+statements -> epsilon
+scope -> '{' declarations statements '}'
+statement -> scope
+else_statement -> epsilon
+statement -> IF '(' expression ')' statement else_statement
+statements -> statements statement
+scope -> '{' declarations statements '}'
+statement -> scope
+else_statement -> ELSE statement
+statement -> IF '(' expression ')' statement else_statement
+statements -> statements statement
+scope -> '{' declarations statements '}'
+statement -> scope
+statement -> WHILE '(' expression ')' statement
+statements -> statements statement
+scope -> '{' declarations statements '}'
+program -> scope

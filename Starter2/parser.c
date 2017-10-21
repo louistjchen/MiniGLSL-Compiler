@@ -521,12 +521,12 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   117,   117,   121,   124,   125,   128,   129,   132,   133,
-     134,   135,   138,   139,   140,   141,   142,   145,   146,   149,
-     149,   150,   150,   151,   151,   154,   155,   156,   157,   158,
-     159,   160,   161,   161,   162,   165,   166,   169,   170,   173,
-     173,   173,   173,   173,   173,   174,   174,   174,   174,   174,
-     174,   174,   177,   180,   183,   184,   187,   188
+       0,   117,   117,   121,   124,   125,   129,   130,   133,   134,
+     135,   136,   139,   140,   141,   142,   143,   146,   147,   150,
+     150,   151,   151,   152,   152,   155,   156,   157,   158,   159,
+     160,   161,   162,   162,   163,   166,   167,   170,   171,   174,
+     174,   174,   174,   175,   175,   175,   175,   176,   176,   176,
+     176,   176,   179,   182,   185,   186,   189,   190
 };
 #endif
 
@@ -1381,14 +1381,344 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        case 31:
-#line 160 "parser.y" /* yacc.c:1646  */
-    { yTRACE("YOYO expression -> expression binary_op expression"); }
+        case 2:
+#line 117 "parser.y" /* yacc.c:1646  */
+    { yTRACE("program -> scope"); }
 #line 1388 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 3:
+#line 121 "parser.y" /* yacc.c:1646  */
+    { yTRACE("scope -> '{' declarations statements '}'"); }
+#line 1394 "y.tab.c" /* yacc.c:1646  */
+    break;
 
-#line 1392 "y.tab.c" /* yacc.c:1646  */
+  case 4:
+#line 124 "parser.y" /* yacc.c:1646  */
+    { yTRACE("declarations -> declarations declaration"); }
+#line 1400 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 5:
+#line 125 "parser.y" /* yacc.c:1646  */
+    { yTRACE("declarations -> epsilon"); }
+#line 1406 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 6:
+#line 129 "parser.y" /* yacc.c:1646  */
+    { yTRACE("statements -> statements statement"); }
+#line 1412 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 7:
+#line 130 "parser.y" /* yacc.c:1646  */
+    { yTRACE("statements -> epsilon"); }
+#line 1418 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 8:
+#line 133 "parser.y" /* yacc.c:1646  */
+    { yTRACE("declaration -> type ID ';'"); }
+#line 1424 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 9:
+#line 134 "parser.y" /* yacc.c:1646  */
+    { yTRACE("declaration -> type ID '=' expression ';'"); }
+#line 1430 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 10:
+#line 135 "parser.y" /* yacc.c:1646  */
+    { yTRACE("declaration -> CONST type ID '=' expression ';'"); }
+#line 1436 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 11:
+#line 136 "parser.y" /* yacc.c:1646  */
+    { yTRACE("declaration -> epsilon"); }
+#line 1442 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 12:
+#line 139 "parser.y" /* yacc.c:1646  */
+    { yTRACE("statement -> variable '=' expression ';'"); }
+#line 1448 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 13:
+#line 140 "parser.y" /* yacc.c:1646  */
+    { yTRACE("statement -> IF '(' expression ')' statement else_statement"); }
+#line 1454 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 14:
+#line 141 "parser.y" /* yacc.c:1646  */
+    { yTRACE("statement -> WHILE '(' expression ')' statement"); }
+#line 1460 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 15:
+#line 142 "parser.y" /* yacc.c:1646  */
+    { yTRACE("statement -> scope"); }
+#line 1466 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 16:
+#line 143 "parser.y" /* yacc.c:1646  */
+    { yTRACE("statement -> ';'"); }
+#line 1472 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 17:
+#line 146 "parser.y" /* yacc.c:1646  */
+    { yTRACE("else_statement -> ELSE statement"); }
+#line 1478 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 18:
+#line 147 "parser.y" /* yacc.c:1646  */
+    { yTRACE("else_statement -> epsilon"); }
+#line 1484 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 19:
+#line 150 "parser.y" /* yacc.c:1646  */
+    { yTRACE("type -> INT_T"); }
+#line 1490 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 20:
+#line 150 "parser.y" /* yacc.c:1646  */
+    { yTRACE("type -> IVEC_T"); }
+#line 1496 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 21:
+#line 151 "parser.y" /* yacc.c:1646  */
+    { yTRACE("type -> BOOL_T"); }
+#line 1502 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 22:
+#line 151 "parser.y" /* yacc.c:1646  */
+    { yTRACE("type -> BVEC_T"); }
+#line 1508 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 23:
+#line 152 "parser.y" /* yacc.c:1646  */
+    { yTRACE("type -> FLOAT_T"); }
+#line 1514 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 24:
+#line 152 "parser.y" /* yacc.c:1646  */
+    { yTRACE("type -> VEC_T"); }
+#line 1520 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 25:
+#line 155 "parser.y" /* yacc.c:1646  */
+    { yTRACE("expression -> constructor"); }
+#line 1526 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 26:
+#line 156 "parser.y" /* yacc.c:1646  */
+    { yTRACE("expression -> function"); }
+#line 1532 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 27:
+#line 157 "parser.y" /* yacc.c:1646  */
+    { yTRACE("expression -> INT_C"); }
+#line 1538 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 28:
+#line 158 "parser.y" /* yacc.c:1646  */
+    { yTRACE("expression -> FLOAT_C"); }
+#line 1544 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 29:
+#line 159 "parser.y" /* yacc.c:1646  */
+    { yTRACE("expression -> variable"); }
+#line 1550 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 30:
+#line 160 "parser.y" /* yacc.c:1646  */
+    { yTRACE("expression -> unary_op expression"); }
+#line 1556 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 31:
+#line 161 "parser.y" /* yacc.c:1646  */
+    { yTRACE("expression -> expression binary_op expression"); }
+#line 1562 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 32:
+#line 162 "parser.y" /* yacc.c:1646  */
+    { yTRACE("expression -> TRUE_C"); }
+#line 1568 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 33:
+#line 162 "parser.y" /* yacc.c:1646  */
+    { yTRACE("expression -> FALSE_C"); }
+#line 1574 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 34:
+#line 163 "parser.y" /* yacc.c:1646  */
+    { yTRACE("expression -> '(' expression ')'"); }
+#line 1580 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 35:
+#line 166 "parser.y" /* yacc.c:1646  */
+    { yTRACE("variable -> ID"); }
+#line 1586 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 36:
+#line 167 "parser.y" /* yacc.c:1646  */
+    { yTRACE("variable -> ID '[' INT_C ']'"); }
+#line 1592 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 37:
+#line 170 "parser.y" /* yacc.c:1646  */
+    { yTRACE("unary_op -> '!'"); }
+#line 1598 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 38:
+#line 171 "parser.y" /* yacc.c:1646  */
+    { yTRACE("unary_op -> UMINUS"); }
+#line 1604 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 39:
+#line 174 "parser.y" /* yacc.c:1646  */
+    { yTRACE("binary_op -> AND"); }
+#line 1610 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 40:
+#line 174 "parser.y" /* yacc.c:1646  */
+    { yTRACE("binary_op -> OR"); }
+#line 1616 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 41:
+#line 174 "parser.y" /* yacc.c:1646  */
+    { yTRACE("binary_op -> EQ"); }
+#line 1622 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 42:
+#line 174 "parser.y" /* yacc.c:1646  */
+    { yTRACE("binary_op -> NEQ"); }
+#line 1628 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 43:
+#line 175 "parser.y" /* yacc.c:1646  */
+    { yTRACE("binary_op -> '<'"); }
+#line 1634 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 44:
+#line 175 "parser.y" /* yacc.c:1646  */
+    { yTRACE("binary_op -> LEQ"); }
+#line 1640 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 45:
+#line 175 "parser.y" /* yacc.c:1646  */
+    { yTRACE("binary_op -> '>'"); }
+#line 1646 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 46:
+#line 175 "parser.y" /* yacc.c:1646  */
+    { yTRACE("binary_op -> GEQ"); }
+#line 1652 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 47:
+#line 176 "parser.y" /* yacc.c:1646  */
+    { yTRACE("binary_op -> '+'"); }
+#line 1658 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 48:
+#line 176 "parser.y" /* yacc.c:1646  */
+    { yTRACE("binary_op -> '-'"); }
+#line 1664 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 49:
+#line 176 "parser.y" /* yacc.c:1646  */
+    { yTRACE("binary_op -> '*'"); }
+#line 1670 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 50:
+#line 176 "parser.y" /* yacc.c:1646  */
+    { yTRACE("binary_op -> '/'"); }
+#line 1676 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 51:
+#line 176 "parser.y" /* yacc.c:1646  */
+    { yTRACE("binary_op -> '^'"); }
+#line 1682 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 52:
+#line 179 "parser.y" /* yacc.c:1646  */
+    { yTRACE("constructor -> type '(' arguments ')'"); }
+#line 1688 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 53:
+#line 182 "parser.y" /* yacc.c:1646  */
+    { yTRACE("function -> FUNC '(' arguments_opt ')'"); }
+#line 1694 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 54:
+#line 185 "parser.y" /* yacc.c:1646  */
+    { yTRACE("arguments_opt -> arguments"); }
+#line 1700 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 55:
+#line 186 "parser.y" /* yacc.c:1646  */
+    { yTRACE("arguments_opt -> epsilon"); }
+#line 1706 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 56:
+#line 189 "parser.y" /* yacc.c:1646  */
+    { yTRACE("arguments -> arguments '.' expression"); }
+#line 1712 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 57:
+#line 190 "parser.y" /* yacc.c:1646  */
+    { yTRACE("arguments -> expression"); }
+#line 1718 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+
+#line 1722 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1616,7 +1946,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 191 "parser.y" /* yacc.c:1906  */
+#line 193 "parser.y" /* yacc.c:1906  */
 
 
 /***********************************************************************ol
