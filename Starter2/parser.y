@@ -1,6 +1,9 @@
 %{
 /***********************************************************************
- * --YOUR GROUP INFO SHOULD GO HERE--
+ *   GROUP 25
+ *   
+ *   Louis Chen - 1000303502
+ *   Juntu Chen - 1000659799
  * 
  *   Interface to the parser module for CSC467 course project.
  * 
@@ -70,7 +73,6 @@ enum {
 %token          BOOL_T
 %token          CONST
 %token          FALSE_C TRUE_C
-%token          FUNC
 %token          IF WHILE ELSE
 %token          AND OR NEQ EQ LEQ GEQ
 
@@ -80,15 +82,19 @@ enum {
 %token <as_vec>   IVEC_T
 %token <as_float> FLOAT_C
 %token <as_int>   INT_C
+%token <as_func>  FUNC
 %token <as_str>   ID
 
-%left     '|'
+%left     OR
+%left	  AND
 %left     '&'
 %nonassoc '=' NEQ '<' LEQ '>' GEQ
 %left     '+' '-'
 %left     '*' '/'
 %right    '^'
 %nonassoc '!' UMINUS
+%left	  '[' ']' '(' ')'
+
 
 %start    program
 
@@ -101,55 +107,81 @@ enum {
  *       language grammar
  *    2. Implement the trace parser option of the compiler
  ***********************************************************************/
-program
-  :   tokens       
-  ;
-tokens
-  :  tokens token  
-  |
-  ;
-token
-  : ID 
-  | AND
-  | OR
-  | NEQ
-  | LEQ
-  | GEQ
-  | EQ
-  | TRUE_C
-  | FALSE_C
-  | INT_C
-  | FLOAT_C
-  | CONST
-  | ELSE
-  | IF
-  | WHILE
-  | FLOAT_T
-  | INT_T
-  | BOOL_T
-  | VEC_T
-  | IVEC_T
-  | BVEC_T
-  | FUNC               
-  | '+'
-  | '-'
-  | '*'
-  | '/'
-  | '^'  
-  | '!'
-  | '='
-  | '<'
-  | '>'   
-  | ','
-  | ';'
-  | '('
-  | ')'
-  | '['
-  | ']'
-  | '{'
-  | '}'                                    
-  ;
 
+program
+	:	scope
+	;
+
+scope
+	:	'{' declarations statements '}'
+	;
+declarations
+	:	declarations declaration
+	|	/* epsilon */
+	;
+statements
+	:	statements statement
+	|	/* epsilon */
+	;
+declaration
+	:	type ID ';'
+	|	type ID '=' expression ';'
+	|	CONST type ID '=' expression ';'
+	|	/* epsilon */
+	;
+statement
+	:	variable '=' expression ';'
+	|	IF '(' expression ')' statement else_statement
+	|	WHILE '(' expression ')' statement
+	|	scope
+	|	';'
+	;
+else_statement
+	:	ELSE statement
+	|	/* epsilon */
+	;
+type
+	:	INT_T | IVEC_T
+	|	BOOL_T | BVEC_T
+	|	FLOAT_T | VEC_T
+	;
+expression
+	:	constructor
+	|	function
+	|	INT_C
+	|	FLOAT_C
+	|	variable
+	|	unary_op expression
+	|	expression binary_op expression { yTRACE("YOYO expression -> expression binary_op expression"); }
+	|	TRUE_C | FALSE_C
+	|	'(' expression ')'
+	;
+variable
+	:	ID
+	|	ID '[' INT_C ']'
+	;
+unary_op
+	:	'!'
+	|	'-' %prec UMINUS
+	;
+binary_op
+	:	AND | OR | EQ | NEQ | '<' | LEQ
+	|	'>' | GEQ | '+' | '-' | '*' | '/' | '^'
+	;
+constructor
+	:	type '(' arguments ')'
+	;
+function
+	:	FUNC '(' arguments_opt ')'
+	;
+arguments_opt
+	:	arguments
+	|	/* epsilon */
+	;
+arguments
+	:	arguments ',' expression
+	|	expression
+	;
 
 %%
 
@@ -159,7 +191,7 @@ token
  * The given yyerror function should not be touched. You may add helper
  * functions as necessary in subsequent phases.
  ***********************************************************************/
-void yyerror(char* s) {
+void yyerror(const char* s) {
   if(errorOccurred) {
     return;    /* Error has already been reported by scanner */
   } else {

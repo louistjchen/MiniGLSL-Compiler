@@ -1,5 +1,8 @@
 /***********************************************************************
- * **YOUR GROUP INFO SHOULD GO HERE**
+ *   GROUP 25
+ *   
+ *   Louis Chen - 1000303502
+ *   Juntu Chen - 1000659799
  *
  * compiler467.c
  *

@@ -1,7 +1,10 @@
 %{
 /**********************************************************************
  *
- * **YOUR GROUP INFO SHOULD GO HERE**
+ *   GROUP 25
+ *   
+ *   Louis Chen - 1000303502
+ *   Juntu Chen - 1000659799
  *
  *  Interface to the scanner module for CSC467 course project
  **********************************************************************/
@@ -39,6 +42,7 @@ int yyline = 1;
 \r?\n                         { yyline++; }
 <<EOF>>                       { yyterminate(); }
 
+","			      { yOUT(yytext[0]); }
 [+\-*/\^]                     { yOUT(yytext[0]); }
 [()[\]{}]                     { yOUT(yytext[0]); }
 [<>=!]                        { yOUT(yytext[0]); }
