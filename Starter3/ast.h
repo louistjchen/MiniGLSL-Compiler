@@ -17,7 +17,7 @@
 struct node_;
 typedef struct node_ node;
 extern node *ast;
-
+/*
 typedef enum {
   UNKNOWN               = 0,
 
@@ -39,33 +39,46 @@ typedef enum {
   ASSIGNMENT_NODE       = (1 << 1) | (1 << 13),
   NESTED_SCOPE_NODE     = (1 << 1) | (1 << 14),
 
-  DECLARATION_NODE      = (1 << 15)
+  DECLARATION_NODE      = (1 << 15),
+  DECLARATIONS_NODE	= (1 << 16)
+} node_kind;
+*/
+
+typedef enum {
+	SCOPE = 0,
+	DECLARATIONS = 1,
+	STATEMENTS = 2,
+	DECLARATION = 3,
+	STATEMENT_ASSIGN = 4,
+	STATEMENT_IF = 5,
+	TYPE = 6,
+	TYPE_FUNC_EXPR = 7,
+	UNARY_EXPR = 8,
+	BINARY_EXPR = 9,
+	LITERAL_EXPR = 10,
+	ARGUMENTS = 11,
+	ARGUMENTS_OPT = 12
 } node_kind;
 
 struct node_ {
 
-  // an example of tagging each node with a type
-  node_kind kind;
+	node_kind kind;
 
-  union {
-    struct {
-      // declarations?
-      // statements?
-    } scope;
-  
-    struct {
-      int op;
-      node *right;
-    } unary_expr;
-
-    struct {
-      int op;
-      node *left;
-      node *right;
-    } binary_expr;
-
-    // etc.
-  };
+	union {
+		struct { node *declarations; node *statements; } scope;
+		struct { node *declarations; node *declaration; } declarations;
+		struct { node *statements; node *statement; } statements;
+		struct { int isConst; node *type; node *ID; node *expression; } declaration;
+		struct { node *variable; node *expression; } statement_assign;
+		struct { node *expression; node *statement_if; node *statement_else; } statement_if;
+		struct { int intT; int ivecT; int boolT; int bvecT; int floatT; int vecT; } type;
+		struct { node *type_func; node *arguments_opt; } type_func_expr;
+		struct { int op; node *right; } unary_expr;
+		struct { int op; node *left; node *right; } binary_expr;
+		struct { bool trueC; bool falseC; int intC; float floatC; } literal_expr;
+		struct { node *arguments; node *expression; } arguments;
+		struct { node *arguments; } arguments_opt;
+	};
 };
 
 node *ast_allocate(node_kind type, ...);
