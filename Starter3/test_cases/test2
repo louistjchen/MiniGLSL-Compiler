@@ -1,0 +1,16 @@
+{
+
+ vec2 a = -1.0;
+ bvec2 L = 1.2;
+ bool b = true;
+ bool d = false;
+ if(1+2<3){
+ 	b = false;
+ } else{
+ 	if(d){
+ 		d = false;
+ 		}
+ }
+
+
+ }

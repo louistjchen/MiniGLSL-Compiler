@@ -17,67 +17,101 @@
 struct node_;
 typedef struct node_ node;
 extern node *ast;
-/*
-typedef enum {
-  UNKNOWN               = 0,
-
-  SCOPE_NODE            = (1 << 0),
-  
-  EXPRESSION_NODE       = (1 << 2),
-  UNARY_EXPRESION_NODE  = (1 << 2) | (1 << 3),
-  BINARY_EXPRESSION_NODE= (1 << 2) | (1 << 4),
-  INT_NODE              = (1 << 2) | (1 << 5), 
-  FLOAT_NODE            = (1 << 2) | (1 << 6),
-  IDENT_NODE            = (1 << 2) | (1 << 7),
-  VAR_NODE              = (1 << 2) | (1 << 8),
-  FUNCTION_NODE         = (1 << 2) | (1 << 9),
-  CONSTRUCTOR_NODE      = (1 << 2) | (1 << 10),
-
-  STATEMENT_NODE        = (1 << 1),
-  IF_STATEMENT_NODE     = (1 << 1) | (1 << 11),
-  WHILE_STATEMENT_NODE  = (1 << 1) | (1 << 12),
-  ASSIGNMENT_NODE       = (1 << 1) | (1 << 13),
-  NESTED_SCOPE_NODE     = (1 << 1) | (1 << 14),
-
-  DECLARATION_NODE      = (1 << 15),
-  DECLARATIONS_NODE	= (1 << 16)
-} node_kind;
-*/
 
 typedef enum {
-	SCOPE = 0,
-	DECLARATIONS = 1,
-	STATEMENTS = 2,
-	DECLARATION = 3,
-	STATEMENT_ASSIGN = 4,
-	STATEMENT_IF = 5,
-	TYPE = 6,
-	TYPE_FUNC_EXPR = 7,
-	UNARY_EXPR = 8,
-	BINARY_EXPR = 9,
-	LITERAL_EXPR = 10,
-	ARGUMENTS = 11,
-	ARGUMENTS_OPT = 12
+	PROGRAM = 0,
+	SCOPE = 1,
+	DECLARATIONS = 2,
+	STATEMENTS = 3,
+	DECLARATION = 4,
+	DECLARATION_ASSIGN = 5,
+	DECLARATION_ASSIGN_CONST = 6,
+	STATEMENT_ASSIGN = 7,
+	STATEMENT_IF_ELSE = 8,
+	STATEMENT_IF = 9,
+	TYPE = 10,
+	EXPRESSION_TYPE = 11,
+	EXPRESSION_FUNC = 12,
+	EXPRESSION_UNARY = 13,
+	EXPRESSION_BINARY = 14,
+	EXPRESSION_BOOL_VALUE = 15,
+	EXPRESSION_INT_VALUE = 16,
+	EXPRESSION_FLOAT_VALUE = 17,
+	EXPRESSION_BRACKET = 18,
+	VARIABLE = 19,
+	ARRAY = 20,
+	ARGUMENTS_MORE_THAN_ONE = 21,
+	ARGUMENTS_ONLY_ONE = 22,
+	ARGUMENTS_OPT = 23,
+	EXPRESSION_VARIABLE = 24
 } node_kind;
+
+typedef enum {
+	INT = 100,
+	IVEC2 = 101,
+	IVEC3 = 102,
+	IVEC4 = 103,
+	FLOAT = 104,
+	VEC2 = 105,
+	VEC3 = 106,
+	VEC4 = 107,
+	BOOL = 108,
+	BVEC2 = 109,
+	BVEC3 = 110,
+	BVEC4 = 111,
+	FUNCTION = 112
+} type_kind;
+
+typedef enum {
+	UNARY_NEGATIVE = 200,
+	UNARY_EXCLAMATION = 201
+} unary_op_kind;
+
+typedef enum {
+	BINARY_AND = 300,
+	BINARY_OR = 301,
+	BINARY_EQ = 302,
+	BINARY_NEQ = 303,
+	BINARY_LT = 304,
+	BINARY_LEQ = 305,
+	BINARY_GT = 306,
+	BINARY_GEQ = 307,
+	BINARY_PLUS = 308,
+	BINARY_MINUS = 309,
+	BINARY_TIMES = 310,
+	BINARY_DIVIDE = 311,
+	BINARY_XOR = 312
+} binary_op_kind;
 
 struct node_ {
 
 	node_kind kind;
-
 	union {
-		struct { node *declarations; node *statements; } scope;
-		struct { node *declarations; node *declaration; } declarations;
-		struct { node *statements; node *statement; } statements;
-		struct { int isConst; node *type; node *ID; node *expression; } declaration;
-		struct { node *variable; node *expression; } statement_assign;
-		struct { node *expression; node *statement_if; node *statement_else; } statement_if;
-		struct { int intT; int ivecT; int boolT; int bvecT; int floatT; int vecT; } type;
-		struct { node *type_func; node *arguments_opt; } type_func_expr;
-		struct { int op; node *right; } unary_expr;
-		struct { int op; node *left; node *right; } binary_expr;
-		struct { bool trueC; bool falseC; int intC; float floatC; } literal_expr;
-		struct { node *arguments; node *expression; } arguments;
-		struct { node *arguments; } arguments_opt;
+		struct { node *scope; int ln; } program;
+		struct { node *declarations; node *statements; int ln; } scope;
+		struct { node *declarations; node *declaration; int ln; } declarations;
+		struct { node *statements; node *statement; int ln; } statements;
+		struct { node *type; char *identifier; int ln; } declaration;
+		struct { node *type; char *identifier; node *expression; int ln; } declaration_assign;
+		struct { node *type; char *identifier; node *expression; int ln; } declaration_assign_const;
+		struct { node *variable; node *expression; int ln; } statement_assign;
+		struct { node *expression; node *statement_valid; node *statement_invalid; int ln; } statement_if_else;
+		struct { node *expression; node *statement_valid; int ln; } statement_if;
+		struct { int type; int ln; } type;
+		struct { node *type; node *arguments; int ln; } expression_type;
+		struct { int function; node *arguments; int ln; } expression_func;
+		struct { int op; node *right; int ln; } expression_unary;
+		struct { int op; node *left; node *right; int ln; } expression_binary;
+		struct { int bool_value; int ln; } expression_bool_value;
+		struct { int int_value; int ln; } expression_int_value;
+		struct { double float_value; int ln; } expression_float_value;
+		struct { node *expression; int ln; } expression_bracket;
+		struct { node *variable; int ln; } expression_variable;
+		struct { char *identifier; int ln; } variable;
+		struct { char *identifier; int index; int ln; } array;
+		struct { node *arguments_more_than_one; node *expression; int ln; } arguments_more_than_one;
+		struct { node *expression; int ln; } arguments_only_one;
+		struct { node *arguments; int ln; } arguments_opt;
 	};
 };
 
