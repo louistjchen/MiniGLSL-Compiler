@@ -1,13 +1,18 @@
 {
 
- vec2 a = -1.0;
- bvec2 L = 1.2;
+int testint = 1;
+float testfloat = 2.0;
+
  bool b = true;
  bool d = false;
  if(1+2<3){
+	int testint_2 = 1;
+	float testfloat_2 = -1.02;
  	b = false;
  } else{
+	int shouldbe2 = 120;
  	if(d){
+		int yinggaishisan = 1;
  		d = false;
  		}
  }

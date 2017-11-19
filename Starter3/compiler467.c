@@ -24,6 +24,7 @@
 
 /* Phases 3,4: Uncomment following includes as needed */
 #include "ast.h"
+#include "symbol.h"
 //#include "codegen.h"
 
 /***********************************************************************
@@ -86,6 +87,15 @@ int main (int argc, char *argv[]) {
   if(1 == yyparse()) {
     return 0; // parse failed
   }
+
+
+
+	symbol_table(ast);
+	pre_defined_value();	
+	print_symbol_table(Head);
+
+
+
 
 /* Phase 3: Call the AST dumping routine if requested */
   if (dumpAST)
