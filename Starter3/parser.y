@@ -84,7 +84,7 @@ enum {
 %token <as_float> FLOAT_C
 %token <as_int>   INT_C
 %token <as_str>   ID
-%token <as_func>  FUNC
+%token <as_str>  FUNC
 
 // operator precdence
 %left     OR                        // 7

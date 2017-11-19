@@ -331,22 +331,7 @@ void ast_print(node * ast) {
 			break;
 		case EXPRESSION_TYPE:
 			printf("\n (CALL ");
-			switch(ast->type.type) {
-				case INT: printf(" INT "); break;
-				case IVEC2: printf(" IVEC2 "); break;
-				case IVEC3: printf(" IVEC3 "); break;
-				case IVEC4: printf(" IVEC4 "); break;
-				case BOOL: printf(" BOOL "); break;
-				case BVEC2: printf(" BVEC2 "); break;
-				case BVEC3: printf(" BVEC3 "); break;
-				case BVEC4: printf(" BVEC4 "); break;
-				case FLOAT: printf(" FLOAT "); break;
-				case VEC2: printf(" VEC2 "); break;
-				case VEC3: printf(" VEC3 "); break;
-				case VEC4: printf(" VEC4 "); break;
-				case FUNCTION: printf(" FUNC "); break;
-				default: printf(" DEFAULT-TYPE%d ", ast->type.type); break;
-			}
+			ast_print(ast->expression_type.type);
 			ast_print(ast->expression_type.arguments);
 			printf(" ) \n");
 			break;
