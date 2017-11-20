@@ -52,8 +52,8 @@ void insert_node(char* Name, int Type, long Line_num, long Scope, attr Attributi
 int get_nodeType(char* Name, long Scope);
 int is_declared(char* Name, long Scope, long Line_num);
 void symbol_table(node* ast);
-void pre_defined_value();
 void print_symbol_table(L_node* List_head);
+int get_attribution(char* Name);
 
 
 #endif
