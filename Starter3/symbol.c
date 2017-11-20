@@ -44,12 +44,29 @@ int get_attribution(char* Name){
 	return -1;
 }
 
+// Check if the ID is declared in the same Scope or parent scopes.
 int is_declared(char* Name, long Scope, long Line_num){
 	L_node* Cur;
 	
 	Cur = Head;
 	while(Cur != NULL){
 		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope <= Scope)){
+			if(Cur->Line_num <= Line_num)
+				return Cur->Type;
+		}
+		else
+			Cur = Cur->Next;
+	}
+	return -1;
+}
+
+// This one is for checking declaration for same ID in the same scope. If declaration is not in the same scope, it is valid (shadowing).
+int is_existed(char* Name, long Scope, long Line_num){
+	L_node* Cur;
+	
+	Cur = Head;
+	while(Cur != NULL){
+		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope == Scope)){
 			if(Cur->Line_num <= Line_num)
 				return Cur->Type;
 		}
@@ -214,7 +231,6 @@ void symbol_table(node* ast){
 			break;
 			
 		default:
-			printf("Unknown case.\n");
 			break;
 	}
 }
