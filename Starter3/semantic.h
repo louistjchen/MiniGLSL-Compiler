@@ -6,5 +6,7 @@
 
 
 int semantic_check( node *ast);
+int numArguments(node *ast);
+
 
 #endif

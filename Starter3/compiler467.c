@@ -25,6 +25,7 @@
 /* Phases 3,4: Uncomment following includes as needed */
 #include "ast.h"
 #include "symbol.h"
+#include "semantic.h"
 //#include "codegen.h"
 
 /***********************************************************************
@@ -105,6 +106,8 @@ int main (int argc, char *argv[]) {
 	symbol_table(ast);
 	print_symbol_table(Head);
 
+	if(semantic_check(ast) == -1)
+		printf("Semantic check failed\n");
 
 
 
