@@ -1,0 +1,37 @@
+Team Report
+--------------------------------------------------------------------------
+Louis Chen - 1000303502
+Juntu Chen - 1000659799
+--------------------------------------------------------------------------
+This report shows the team's approach to finishing lab3.
+--------------------------------------------------------------------------
+
+Approach to AST structure
+1. We allocate a node for each incoming valid terminal/non-terminals, and properly link each node to its predecessor and successor.
+2. We determine that all leaves of the AST tree must be terminals, and therefore linking all terminals lead to non-terminal nodes construction.
+3. Through bottom-up approach, we could build the tree
+4. For freeing, we use post-order traversal because we need to free every node's children first.
+5. For printing, we use pre-order traversal because we need to print a node's children information inside the node.
+
+
+Approach to Semantic checking
+1. We determine that all terminals (or leaves in the tree) must have a valid type, therefore we assign corresponding type for all leaves first (through a switch case statement).
+2. Inside the switch case statement, we then call semantic_check function recursively for the node types that are not terminal nodes, and only have 1 child node.
+3. For non-terminal nodes that have more than 1 child nodes, we first call semantic_check on all non-terminal child nodes, and see if they are valid. If invalid semantic, we return -1. If valid, we perform step 4 as below.
+4. We test on types between the child nodes, and apply all rules specified in the handout, such as assignment type consistency, some type can take type that has less arguments than itself, and so on.
+
+
+Breakdown of work
+- ast.c/ast.h - Louis Chen
+- symbol.c/symbol.h - Juntu Chen
+- semantic.c/semantic.h - BOTH
+- compiler467.c - BOTH
+- everything else that needs to be modified - BOTH
+
+
+Challenges faced/Novelties
+1. We had a hard time when deciding what node types to have. Some nodes can be combined together, some cannot. Therefore we eventually decided to declare a node for all the parser grammers. This has eased things down, although consumes longer run time.
+2. We realized this lab is a relatively large in terms of lines of code needed to be implemented, and the recursive/entertwined concepts that needed to be understood beforehand. We couldn't have enough time to finish all the corner cases checking, despite we started the lab as soon as it was released. Even though we have implemented all functionalities/rules specified in the handout, there is still some connections between some cases that are not structured properly. Therefore, we hope that this lab will not be marked only regarding to the automatic tester results, but also to the actual code content and flow.
+
+Bonus
+1. Our code prints out line numbers when there is parser errors and semantic errors.
