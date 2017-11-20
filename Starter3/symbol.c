@@ -30,7 +30,7 @@ void insert_node(char* Name, int Type, long Line_num, long Scope, attr Attributi
 	}
 }
 
-int get_nodeType(char* Name){
+int get_attribution(char* Name){
 	L_node* Cur;
 	
 	Cur = Head;
@@ -38,7 +38,7 @@ int get_nodeType(char* Name){
 		if (strcmp(Cur->Name, Name) != 0)
 			Cur = Cur->Next;
 		else
-			return Cur->Type;
+			return Cur->Attribution;
 	}
 	printf("Such a Name doesn't exists in the symbol table.\n");
 	return -1;
@@ -77,6 +77,7 @@ void symbol_table(node* ast){
 	
 	switch(ast->kind){
 		case PROGRAM:
+			//Every time get into a new {}, the scope number should increase.
 			Scope_num ++;
 			symbol_table(ast->program.scope);
 			Scope_num --;
@@ -140,7 +141,7 @@ void symbol_table(node* ast){
 			break;
 			
 		case TYPE:
-			// Type is terminal but not a var. Do nothing.
+			// Type is terminal but not a var declaration. Do nothing.
 			break;
 		
 		case EXPRESSION_TYPE:
@@ -170,7 +171,7 @@ void symbol_table(node* ast){
 			break;
 		
 		case EXPRESSION_UNARY:
-			// OP is a enum, not a var. Do nothing.
+			// OP is a enum, not a var declaration. Do nothing.
 			symbol_table(ast->expression_unary.right);
 			break;
 			
@@ -180,25 +181,19 @@ void symbol_table(node* ast){
 			break;
 		
 		case EXPRESSION_BOOL_VALUE:
-			// It is a value, not a var. Do nothing.
+			// It is a value, not a var declaration. Do nothing.
 			break;
 		
 		case EXPRESSION_INT_VALUE:
-			// It is a value, not a var. Do nothing.
+			// It is a value, not a var declaration. Do nothing.
 			break;
 		
 		case EXPRESSION_FLOAT_VALUE:
-			// It is a value, not a var. Do nothing.
+			// It is a value, not a var declaration. Do nothing.
 			break;
 
 		case EXPRESSION_BRACKET:
 			symbol_table(ast->expression_bracket.expression);
-			break;
-		
-		case VARIABLE:
-			break;
-		
-		case ARRAY:
 			break;
 		
 		case ARGUMENTS_MORE_THAN_ONE:
