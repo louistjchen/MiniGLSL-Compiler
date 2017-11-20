@@ -89,9 +89,20 @@ int main (int argc, char *argv[]) {
   }
 
 
-
+	insert_node("env1", VEC4, 0, 0, U);
+	insert_node("env2", VEC4, 0, 0, U);
+	insert_node("env3", VEC4, 0, 0, U);
+	insert_node("gl_FragColor", VEC4, 0, 0, R);
+	insert_node("gl_TexCoord", VEC4, 0, 0, A);
+	insert_node("gl_FragCoord", VEC4, 0, 0, R);
+	insert_node("gl_Color", VEC4, 0, 0, A);
+	insert_node("gl_Secondary", VEC4, 0, 0, A);
+	insert_node("gl_Light_Half", VEC4, 0, 0, U);
+	insert_node("gl_FogFragCoord", VEC4, 0, 0, A);
+	insert_node("gl_Light_Ambient", VEC4, 0, 0, U);
+	insert_node("gl_Material_Shininess", VEC4, 0, 0, U);
+	insert_node("gl_FragDepth", BOOL, 0, 0, R);
 	symbol_table(ast);
-	pre_defined_value();	
 	print_symbol_table(Head);
 
 
