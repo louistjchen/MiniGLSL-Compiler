@@ -1,3 +1,13 @@
+/*
+ * * Louis Chen - 1000303502
+ * Juntu Chen - 1000659799
+
+ *
+ * */
+
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,6 +20,7 @@
 #define DEBUG_PRINT_TREE 0
 
 node *ast = NULL;
+int sscope = 0;
 
 node *ast_allocate(node_kind kind, ...) {
 	va_list args;

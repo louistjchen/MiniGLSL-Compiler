@@ -1,6 +1,8 @@
 /***********************************************************************
  * **YOUR GROUP INFO SHOULD GO HERE**
- *
+  * Louis Chen - 1000303502
+ * Juntu Chen - 1000659799
+*
  * globalvars.c
  *
  * CSC467 Project Compiler Shared Global Variables

@@ -1,6 +1,10 @@
 /***********************************************************************
  * **YOUR GROUP INFO SHOULD GO HERE**
  *
+ *
+ * Louis Chen - 1000303502
+ * Juntu Chen - 1000659799
+ *
  * common.h
  *
  * common definitions that are used throughout the compiler.

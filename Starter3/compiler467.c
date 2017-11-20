@@ -1,6 +1,8 @@
 /***********************************************************************
  * **YOUR GROUP INFO SHOULD GO HERE**
- *
+  * Louis Chen - 1000303502
+ * Juntu Chen - 1000659799
+*
  * compiler467.c
  *
  * This is the main driver program for the CSC467F course project
@@ -106,9 +108,9 @@ int main (int argc, char *argv[]) {
 	symbol_table(ast);
 	print_symbol_table(Head);
 
-	if(semantic_check(ast) == -1)
+	int ret_semantic = semantic_check(ast);
+	if(ret_semantic == -1)
 		printf("Semantic check failed\n");
-
 
 
 /* Phase 3: Call the AST dumping routine if requested */

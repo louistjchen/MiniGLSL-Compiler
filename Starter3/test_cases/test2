@@ -1,21 +1,11 @@
 {
 
-int testint = 1;
-float testfloat = 2.0;
+const int testint = 1;
 
  bool b = true;
  bool d = false;
- if(1+2<3){
-	int testint_2 = 1;
-	float testfloat_2 = -1.02;
- 	b = false;
- } else{
-	int shouldbe2 = 120;
- 	if(d){
-		int yinggaishisan = 1;
- 		d = false;
- 		}
+ if(true){
+ 	testint = 2;
  }
-
 
  }

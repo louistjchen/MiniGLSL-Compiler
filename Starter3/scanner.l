@@ -2,7 +2,9 @@
 /**********************************************************************
  *
  * **YOUR GROUP INFO SHOULD GO HERE**
- *
+  * Louis Chen - 1000303502
+ * Juntu Chen - 1000659799
+*
  *  Interface to the scanner module for CSC467 course project
  **********************************************************************/
 

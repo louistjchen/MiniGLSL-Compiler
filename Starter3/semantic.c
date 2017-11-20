@@ -1,39 +1,221 @@
+/*
+ * * Louis Chen - 1000303502
+ * Juntu Chen - 1000659799
+
+ *
+ *
+ * */
+
 
 #include "semantic.h"
+
+int scopesem = 0;
+
 
 int semantic_check( node *ast) {
 
 	// base case, return -1
 	if(ast == NULL)
-		return -1;
+		return 0;
 
 	int ret, ret2, numArgs, temp;
 
   	switch(ast->kind) {
 
 		case PROGRAM:
+			scopesem++;
 			return semantic_check(ast->program.scope);
+			scopesem--;
 			break;
 		case SCOPE:
-			if(semantic_check(ast->scope.declarations) == -1) return -1;
-			else if(semantic_check(ast->scope.statements) == -1) return -1;
+			if(semantic_check(ast->scope.declarations) == -1) { return -1;}
+			else if(semantic_check(ast->scope.statements) == -1) { return -1;}
 			else return 0;
 			break;
 		case DECLARATIONS:
-			if(semantic_check(ast->declarations.declarations) == -1) return -1;
-			else if(semantic_check(ast->declarations.declaration) == -1) return -1;
+			if(semantic_check(ast->declarations.declarations) == -1) { return -1;}
+			else if(semantic_check(ast->declarations.declaration) == -1) {return -1;}
 			else return 0;
 			break;
 		case STATEMENTS:
-			if(semantic_check(ast->statements.statements) == -1) return -1;
-			else if(semantic_check(ast->statements.statement) == -1) return -1;
+			if(semantic_check(ast->statements.statements) == -1) {return -1;}			else if(semantic_check(ast->statements.statement) == -1) {return -1;}
 			else return 0;
 			break;
 		case DECLARATION:
+			temp = is_existed(ast->declaration.identifier, scopesem, ast->declaration.ln);
+			// id not exists
+			if(temp < 0)
+				// check its type
+				return semantic_check(ast->declaration.type);
+			else {
+				printf("Semantic error 1(declaration identifier already declared) occurs at line %d\n", ast->declaration.ln);
+				return -1;
+			}
 			break;
 		case DECLARATION_ASSIGN:
+			ret = semantic_check(ast->declaration_assign.type);
+			ret2 = semantic_check(ast->declaration_assign.expression);
+
+			if(ret < 0) return -1;
+			else if(ret2 < 0) return -1;
+
+			temp = is_existed(ast->declaration_assign.identifier, scopesem, ast->declaration_assign.ln);
+			// id exists
+			if(temp < 0) {
+				printf("Semantic error 2(declaration_assign identifier already declared) occurs at line %d\n", ast->declaration_assign.ln);
+				return -1;
+			}
+
+			// expression assign validity
+			if(ast->declaration_assign.expression->kind == VARIABLE) {
+				temp = get_attribution(ast->declaration_assign.identifier);
+				if(temp == 900) {
+					printf("Semantic error (declaration_assign result can't be read) occurs at line %d\n", ast->declaration_assign.ln);
+					return -1;
+				}
+			}
+
+			// assign type validity
+			switch(ret2) {
+				case INT:
+					if(ret == INT || ret == IVEC2 || ret == IVEC3 || ret == IVEC4)
+						return ret;
+					break;
+				case IVEC2:
+					if(ret == IVEC2 || ret == IVEC3 || ret == IVEC4)
+						return ret;
+					break;
+				case IVEC3:
+					if(ret == IVEC3 || ret == IVEC4)
+						return ret;
+					break;
+				case IVEC4:
+					if(ret == IVEC4)
+						return ret;
+					break;
+				case FLOAT:
+					if(ret == FLOAT || ret == VEC2 || ret == VEC3 || ret == VEC4)
+						return ret;
+					break;
+				case VEC2:
+					if(ret == VEC2 || ret == VEC3 || ret == VEC4)
+						return ret;
+					break;
+				case VEC3:
+					if(ret == VEC3 || ret == VEC4)
+						return ret;
+					break;
+				case VEC4:
+					if(ret == VEC4)
+						return ret;
+					break;
+				case BOOL:
+					if(ret == BOOL || ret == BVEC2 || ret == BVEC3 || ret == BVEC4)
+						return ret;
+					break;
+				case BVEC2:
+					if(ret == BVEC2 || ret == BVEC3 || ret == BVEC4)
+						return ret;
+					break;
+				case BVEC3:
+					if(ret == BVEC3 || ret == BVEC4)
+						return ret;
+					break;
+				case BVEC4:
+					if(ret == BVEC4)
+						return ret;
+					break;
+				default:
+					printf("Semantic error (declaration_assign unknown variable type) occurs at line %d\n", ast->declaration_assign.ln);
+					return -1;
+					break;
+			}
+
+			printf("Semantic error (declaration_assign invalid assign combination) occurs at line %d\n", ast->declaration_assign.ln);
+			return -1;
 			break;
 		case DECLARATION_ASSIGN_CONST:
+
+			ret = semantic_check(ast->declaration_assign_const.type);
+			ret2 = semantic_check(ast->declaration_assign_const.expression);
+
+			if(ret < 0) return -1;
+			else if(ret2 < 0) return -1;
+
+			temp = is_existed(ast->declaration_assign_const.identifier, scopesem, ast->declaration_assign_const.ln);
+			// id exists
+			if(temp < 0) {
+				printf("Semantic error 3(declaration_assign_const identifier already declared) occurs at line %d\n", ast->declaration_assign_const.ln);
+				return -1;
+			}
+
+			// expression assign validity
+			if(ast->declaration_assign_const.expression->kind == VARIABLE) {
+				temp = get_attribution(ast->declaration_assign_const.identifier);
+				if(temp == 900) {
+					printf("Semantic error (declaration_assign_const result can't be read) occurs at line %d\n", ast->declaration_assign_const.ln);
+					return -1;
+				}
+			}
+
+			// assign type validity
+			switch(ret2) {
+				case INT:
+					if(ret == INT || ret == IVEC2 || ret == IVEC3 || ret == IVEC4)
+						return ret;
+					break;
+				case IVEC2:
+					if(ret == IVEC2 || ret == IVEC3 || ret == IVEC4)
+						return ret;
+					break;
+				case IVEC3:
+					if(ret == IVEC3 || ret == IVEC4)
+						return ret;
+					break;
+				case IVEC4:
+					if(ret == IVEC4)
+						return ret;
+					break;
+				case FLOAT:
+					if(ret == FLOAT || ret == VEC2 || ret == VEC3 || ret == VEC4)
+						return ret;
+					break;
+				case VEC2:
+					if(ret == VEC2 || ret == VEC3 || ret == VEC4)
+						return ret;
+					break;
+				case VEC3:
+					if(ret == VEC3 || ret == VEC4)
+						return ret;
+					break;
+				case VEC4:
+					if(ret == VEC4)
+						return ret;
+					break;
+				case BOOL:
+					if(ret == BOOL || ret == BVEC2 || ret == BVEC3 || ret == BVEC4)
+						return ret;
+					break;
+				case BVEC2:
+					if(ret == BVEC2 || ret == BVEC3 || ret == BVEC4)
+						return ret;
+					break;
+				case BVEC3:
+					if(ret == BVEC3 || ret == BVEC4)
+						return ret;
+					break;
+				case BVEC4:
+					if(ret == BVEC4)
+						return ret;
+					break;
+				default:
+					printf("Semantic error (declaration_assign_const unknown variable type) occurs at line %d\n", ast->declaration_assign_const.ln);
+					return -1;
+					break;
+			}
+
+			printf("Semantic error (declaration_assign_const invalid assign combination) occurs at line %d\n", ast->declaration_assign_const.ln);
+			return -1;
 			break;
 		case STATEMENT_ASSIGN:
 			ret = semantic_check(ast->statement_assign.variable);
@@ -42,7 +224,7 @@ int semantic_check( node *ast) {
 			if(ret < 0) return -1;
 			else if(ret2 < 0) return -1;
 
-			temp = is_declared( ast->statement_assign.variable->variable.identifier , Scope_num, ast->statement_assign.ln);
+			temp = is_declared( ast->statement_assign.variable->variable.identifier , scopesem, ast->statement_assign.ln);
 			if(temp < 0) {
 				printf("Semantic error (statement_assign variable name not declared) occurs at line %d\n", ast->statement_assign.ln);
 				return -1;
@@ -379,7 +561,7 @@ int semantic_check( node *ast) {
 			return semantic_check(ast->expression_variable.variable);			
 			break;
 		case VARIABLE:
-			ret = is_declared(ast->variable.identifier, Scope_num, ast->variable.ln);
+			ret = is_declared(ast->variable.identifier, scopesem, ast->variable.ln);
 			if(ret < 0) {
 				printf("Semantic error (variable not declared) occurs at line %d\n", ast->variable.ln);
 				return -1;
@@ -388,7 +570,7 @@ int semantic_check( node *ast) {
 				return ret;
 			break;
 		case ARRAY:
-			ret = is_declared(ast->array.identifier, Scope_num, ast->array.ln);
+			ret = is_declared(ast->array.identifier, scopesem, ast->array.ln);
 			if(ret < 0) {
 				printf("Semantic error (vector not declared) occurs at line %d\n", ast->array.ln);
 				return -1;
@@ -438,12 +620,29 @@ int semantic_check( node *ast) {
 			}
 			break;
 		case ARGUMENTS_MORE_THAN_ONE:
+			ret = semantic_check(ast->arguments_more_than_one.arguments_more_than_one);
+			ret2 = semantic_check(ast->arguments_more_than_one.expression);
+			if(ret < 0) return -1;
+			else if(ret2 < 0) return -1;
+
+			// if both arguments same type, then return their types
+			if(ret == ret2)
+				return ret;
+			// else report error because types in arguments must be the same
+			else {
+				printf("Semantic error (arguments_more_than_one arguments' types don't match) occurs at line %d\n", ast->arguments_more_than_one.ln);
+				return -1;
+			}
 			break;
 		case ARGUMENTS_ONLY_ONE:
+			return semantic_check(ast->arguments_only_one.expression);
 			break;
 		case ARGUMENTS_OPT:
+			return semantic_check(ast->arguments_opt.arguments);
 			break;
 		default:
+			printf("Semantic error (default case should not enter here) occurs");
+			return -1;
 			break;
   	}      
 

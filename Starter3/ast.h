@@ -1,9 +1,19 @@
+/*
+ * * Louis Chen - 1000303502
+ * Juntu Chen - 1000659799
+
+ *
+ *
+ *
+ *
+ * */
+
 
 #ifndef AST_H_
 #define AST_H_ 1
 
 #include <stdarg.h>
-
+extern int sscope;
 // Dummy node just so everything compiles, create your own node/nodes
 //
 // The code provided below is an example ONLY. You can use/modify it,
