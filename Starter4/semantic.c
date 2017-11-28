@@ -43,12 +43,12 @@ int semantic_check( node *ast) {
 			break;
 		case DECLARATION:
 			temp = is_existed(ast->declaration.identifier, scopesem, ast->declaration.ln);
-			// id not exists
-			if(temp < 0)
+			// id exists
+			if(temp >= 0)
 				// check its type
 				return semantic_check(ast->declaration.type);
 			else {
-				printf("Semantic error 1(declaration identifier already declared) occurs at line %d\n", ast->declaration.ln);
+				printf("Semantic error (declaration identifier not declared) occurs at line %d\n", ast->declaration.ln);
 				return -1;
 			}
 			break;
@@ -62,7 +62,7 @@ int semantic_check( node *ast) {
 			temp = is_existed(ast->declaration_assign.identifier, scopesem, ast->declaration_assign.ln);
 			// id exists
 			if(temp < 0) {
-				printf("Semantic error 2(declaration_assign identifier already declared) occurs at line %d\n", ast->declaration_assign.ln);
+				printf("Semantic error (declaration_assign identifier already declared) occurs at line %d\n", ast->declaration_assign.ln);
 				return -1;
 			}
 
@@ -485,7 +485,7 @@ int semantic_check( node *ast) {
 			if(ast->expression_binary.op == BINARY_AND || ast->expression_binary.op == BINARY_OR) {
 				if(ret == ret2) {
 					if(ret == BOOL || ret == BVEC2 || ret == BVEC3 || ret == BVEC4)
-						return ret;
+						return BOOL;
 					else {
 						printf("Semantic error (expression_binary && || invalid type) occurs at line %d\n", ast->expression_binary.ln);
 						return -1;
@@ -501,7 +501,7 @@ int semantic_check( node *ast) {
 				if(ret == ret2) {
 					// left right both int or float, scalar
 					if(ret == INT || ret == FLOAT)
-						return ret;
+						return BOOL;
 					else {
 						printf("Semantic error (expression_binary < <= > >= invalid type \"not INT or FLOAT\") occurs at line %d\n", ast->expression_binary.ln);
 						return -1;
@@ -517,7 +517,7 @@ int semantic_check( node *ast) {
 				if(ret == ret2) {
 					// left right both int or float, both scalar or vector
 					if(ret == INT || ret == IVEC2 || ret == IVEC3 || ret == IVEC4 || ret == FLOAT || ret == VEC2 || ret == VEC3 || ret == VEC4)
-						return ret;
+						return BOOL;
 					else {
 						printf("Semantic error (expression_binary == != invalid type \"not INT or FLOAT or their vector types\" occurs at line %d\n", ast->expression_binary.ln);
 						return -1;
