@@ -343,35 +343,72 @@ int semantic_check( node *ast) {
 			if(ret < 0) return ret;
 			else if(ret2 < 0) return ret2;
 
-			if(ret == ret2) return ret;
-
 			numArgs = numArguments(ast->expression_type.arguments);
 			if(ret == INT || ret == FLOAT || ret == BOOL) {
-				if(numArgs == 1)
+				if(numArgs == 1 && ret == ret2)
 					return ret;
-				else {
+				else if(ret != ret2){
+					printf("Semantic error (expression_type assign wrong scalar type to a scalar) occurs at line %d\n", ast->expression_type.ln);
+					return -1;
+				}
+				else{
 					printf("Semantic error (expression_type assign a vector to a scalar type) occurs at line %d\n", ast->expression_type.ln);
 					return -1;
 				}
 			}
 			else if(ret == IVEC2 || ret == VEC2 || ret == BVEC2) {
 				if(numArgs == 2)
-					return ret;
+					if(ret == IVEC2 && ret2 == INT)
+						return ret;
+					else if(ret == VEC2 && ret2 == FLOAT)
+						return ret;
+					else if(ret == BVEC2 && ret2 == BOOL)
+						return ret;
+					else {	
+						printf("Semantic error (expression_type assign wrong i/b/vec2 type to a i/b/vec2) occurs at line %d\n", ast->expression_type.ln);
+						return -1;
+					}
 				else {
-					printf("Semantic error (expression_type assign more than 2 args for IVEC2/BVEC2/VEC2) occurs at line %d\n", ast->expression_type.ln);
+					printf("Semantic error (expression_type assign not 2 args for IVEC2/BVEC2/VEC2) occurs at line %d\n", ast->expression_type.ln);
 					return -1;
 				}
 			}
 			else if(ret == IVEC3 || ret == VEC3 || ret == BVEC3) {
 				if(numArgs == 3)
-					return ret;
+					if(ret == IVEC3 && ret2 == INT)
+						return ret;
+					else if(ret == VEC3 && ret2 == FLOAT)
+						return ret;
+					else if(ret == BVEC3 && ret2 == BOOL)
+						return ret;
+					else {	
+						printf("Semantic error (expression_type assign wrong i/b/vec3 type to a i/b/vec3) occurs at line %d\n", ast->expression_type.ln);
+						return -1;
+					}
 				else {
-					printf("Semantic error (expression_type assign more than 3 args for IVEC3/BVEC3/VEC3) occurs at line %d\n", ast->expression_type.ln);
+					printf("Semantic error (expression_type assign not 3 args for IVEC3/BVEC3/VEC3) occurs at line %d\n", ast->expression_type.ln);
+					return -1;
+				}
+			}
+			else if(ret == IVEC4 || ret == VEC4 || ret == BVEC4) {
+				if(numArgs == 4)
+					if(ret == IVEC4 && ret2 == INT)
+						return ret;
+					else if(ret == VEC4 && ret2 == FLOAT)
+						return ret;
+					else if(ret == BVEC4 && ret2 == BOOL)
+						return ret;
+					else {	
+						printf("Semantic error (expression_type assign wrong i/b/vec4 type to a i/b/vec4) occurs at line %d\n", ast->expression_type.ln);
+						return -1;
+					}
+				else {
+					printf("Semantic error (expression_type assign not 4 args for IVEC4/BVEC4/VEC4) occurs at line %d\n", ast->expression_type.ln);
 					return -1;
 				}
 			}
 			else {
-				printf("Semantic error (expression_type unknown type) occurs at line\n");
+				printf("Semantic error (expression_type unknown type) occurs at line %d. If you see this, then you're in trouble\n", ast->expression_type.ln);
 				return -1;
 			}
 
@@ -660,7 +697,9 @@ int numArguments(node *ast) {
 
 	if(ast->kind == ARGUMENTS_MORE_THAN_ONE)
 		return numArguments(ast->arguments_more_than_one.arguments_more_than_one) + 1;
-	else if(ast->kind >= PROGRAM && ast->kind <= ARGUMENTS_OPT)
+	else if(ast->kind == ARGUMENTS_OPT)
+		return numArguments(ast->arguments_opt.arguments);
+	else if(ast->kind >= PROGRAM && ast->kind <= ARGUMENTS_ONLY_ONE)
 		return 1;
 	else {
 		printf("Semantic error (undefined node type)\n");
