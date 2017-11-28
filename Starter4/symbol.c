@@ -63,7 +63,7 @@ int is_declared(char* Name, long Scope, long Line_num){
 	while(Cur != NULL){
 		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope <= Scope) && (Cur->Line_num <= Line_num)){
 			// At current scope
-			if(Cur->Scope == global_dummy_count){
+			if(Cur->Count == global_dummy_count){
 				return Cur->Type;
 			}
 			else if(Cur->Scope < Scope)
