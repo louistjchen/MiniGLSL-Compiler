@@ -83,6 +83,12 @@ int is_existed(char* Name, long Scope, long Line_num){
 	L_node* Cur;
 	L_node* Temp;
 	
+	Cur = Head;
+	while(Cur != NULL){
+		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope == 0))
+			return Cur->Attribution;
+	}
+	
 	Temp = NULL;
 	Cur = Head;
 	while(Cur != NULL){
