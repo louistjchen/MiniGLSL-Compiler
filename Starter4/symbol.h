@@ -54,6 +54,7 @@ typedef struct L_node{
 
 extern L_node* Head;
 extern long Scope_num;
+extern long global_dummy_count;
 
 
 

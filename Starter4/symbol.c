@@ -14,7 +14,7 @@
 L_node* Head = NULL;
 long Scope_num = 0;
 long Dummy_count = 0;
-
+long global_dummy_count = 0;
 
 // Linked-list functions
 void insert_node(char* Name, int Type, long Line_num, long Scope, attr Attribution, long Count){
@@ -59,34 +59,18 @@ int get_attribution(char* Name){
 // Check if the ID is declared in the same Scope or parent scopes.
 int is_declared(char* Name, long Scope, long Line_num){
 	L_node* Cur;
-	L_node* Temp;
-	
-	Temp = NULL;
 	Cur = Head;
 	while(Cur != NULL){
-		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope == Scope)){
-			if(Cur->Line_num == Line_num)
-				Temp = Cur;
-				break;
+		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope <= Scope) && (Cur->Line_num <= Line_num)){
+			// At current scope
+			if(Cur->Scope == global_dummy_count){
+				return Cur->Type;
+			}
+			else if(Cur->Scope < Scope)
+				return Cur->Type;
 		}
 		Cur = Cur->Next;
 	}
-	if(Temp == NULL)
-		return -1;
-	else{
-		Cur = Head;
-		while(Cur != NULL){
-			if(strcmp(Cur->Name, Temp->Name) == 0 && (Cur->Scope <= Temp->Scope)){
-				if((Cur->Scope == Temp->Scope) && (Cur->Count != Temp->Count))
-					continue;
-				if((Cur->Line_num <= Temp->Line_num))
-					 return Cur->Type;
-			}
-			Cur = Cur->Next;
-		}
-		return -1;
-	}
-	printf("You should not get here, you are in trouble!\n");
 	return -1;
 }
 
