@@ -46,6 +46,7 @@ typedef struct L_node{
 	int Type;
 	long Line_num;
 	long Scope;
+	long Count;
 	
 	struct L_node* Next;
 }L_node;
@@ -57,7 +58,7 @@ extern long Scope_num;
 
 
 // Functions
-void insert_node(char* Name, int Type, long Line_num, long Scope, attr Attribution);
+void insert_node(char* Name, int Type, long Line_num, long Scope, attr Attribution, long Count);
 int get_nodeType(char* Name, long Scope);
 int is_declared(char* Name, long Scope, long Line_num);
 void symbol_table(node* ast);

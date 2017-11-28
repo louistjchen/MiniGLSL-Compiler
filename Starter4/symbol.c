@@ -13,10 +13,11 @@
 // Global variables
 L_node* Head = NULL;
 long Scope_num = 0;
+long Dummy_count = 0;
 
 
 // Linked-list functions
-void insert_node(char* Name, int Type, long Line_num, long Scope, attr Attribution){
+void insert_node(char* Name, int Type, long Line_num, long Scope, attr Attribution, long Count){
 	// Creat a new list node for the variable, since we don't want to mess up the symbol table with AST tree nodes.
 	L_node* Cur;
 	Cur = (struct L_node*)malloc(sizeof (L_node));
@@ -27,6 +28,7 @@ void insert_node(char* Name, int Type, long Line_num, long Scope, attr Attributi
 	Cur->Line_num = Line_num;
 	Cur->Scope = Scope;
 	Cur->Attribution = (int)Attribution;
+	Cur->Count = Dummy_count;
 	strcpy(Cur->Name, Name);
 	
 	// Like a stack, new nodes are pushed to the front of the list.
@@ -71,15 +73,33 @@ int is_declared(char* Name, long Scope, long Line_num){
 // This one is for checking declaration for same ID in the same scope. If declaration is not in the same scope, it is valid (shadowing).
 int is_existed(char* Name, long Scope, long Line_num){
 	L_node* Cur;
+	L_node* Temp;
 	
+	Temp = NULL;
 	Cur = Head;
 	while(Cur != NULL){
 		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope == Scope))
-			if(Cur->Line_num < Line_num)
-				return Cur->Type;
+			if(Cur->Line_num == Line_num){
+				 Temp = Cur;
+				 break;
+			}
 		Cur = Cur->Next;
 	}
-	return -1;
+	if(Temp == NULL)
+		return -1;
+	else{
+		Cur = Head;
+		while(Cur != NULL){
+			if(strcmp(Cur->Name, Temp->Name) == 0 && (Cur->Scope == Temp->Scope)){
+				if((Cur->Line_num < Temp->Line_num) && (Cur->Count == Temp->Count))
+					 return Cur->Type;
+			}
+			Cur = Cur->Next;
+		}
+		return -1;
+	}
+	printf("You should not get here, you are in trouble!\n");
+	return 1;
 }
 
 void print_symbol_table(L_node* List_head){
@@ -102,6 +122,7 @@ void symbol_table(node* ast){
 		case PROGRAM:
 			//Every time get into a new {}, the scope number should increase.
 			Scope_num ++;
+			Dummy_count ++;
 			symbol_table(ast->program.scope);
 			Scope_num --;
 			break;
@@ -125,14 +146,14 @@ void symbol_table(node* ast){
 			symbol_table(ast->declaration.type);
 			// Identifier is a Terminal and the name of a var, so we insert it into the symbol table
 			insert_node(ast->declaration.identifier, ast->declaration.type->type.type, 
-			ast->declaration.ln, Scope_num, N);
+			ast->declaration.ln, Scope_num, N, Dummy_count);
 			break;
 		
 		case DECLARATION_ASSIGN:
 			symbol_table(ast->declaration_assign.type);
 			
 			insert_node(ast->declaration_assign.identifier, ast->declaration_assign.type->type.type,
-			ast->declaration_assign.ln, Scope_num, N);
+			ast->declaration_assign.ln, Scope_num, N, Dummy_count);
 			
 			symbol_table(ast->declaration_assign.expression);
 			break;
@@ -142,7 +163,7 @@ void symbol_table(node* ast){
 			
 			insert_node(ast->declaration_assign_const.identifier, 
 			ast->declaration_assign_const.type->type.type,
-			ast->declaration_assign_const.ln, Scope_num, C);
+			ast->declaration_assign_const.ln, Scope_num, C, Dummy_count);
 			
 			symbol_table(ast->declaration_assign.expression);
 			break;
@@ -175,15 +196,15 @@ void symbol_table(node* ast){
 		case EXPRESSION_FUNC:
 			switch(ast->expression_func.function){
 				case 0:
-					insert_node("dp3", FUNCTION, ast->expression_func.ln, Scope_num, N);
+					insert_node("dp3", FUNCTION, ast->expression_func.ln, Scope_num, N, Dummy_count);
 				break;
 				
 				case 1:
-					insert_node("lit", FUNCTION, ast->expression_func.ln, Scope_num, N);
+					insert_node("lit", FUNCTION, ast->expression_func.ln, Scope_num, N, Dummy_count);
 				break;
 				
 				case 2:
-					insert_node("rsq", FUNCTION, ast->expression_func.ln, Scope_num, N);
+					insert_node("rsq", FUNCTION, ast->expression_func.ln, Scope_num, N, Dummy_count);
 				break;
 				
 				default:
