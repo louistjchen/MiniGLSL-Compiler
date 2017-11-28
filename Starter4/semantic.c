@@ -24,7 +24,7 @@ int semantic_check( node *ast) {
 
 		case PROGRAM:
 			scopesem++;
-			global_dummy_count++;
+			global_dummy_count[scopesem]++;
 			ret = semantic_check(ast->program.scope);
 			scopesem--;
 			return ret;

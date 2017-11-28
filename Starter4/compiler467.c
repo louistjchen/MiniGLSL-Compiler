@@ -91,20 +91,25 @@ int main (int argc, char *argv[]) {
     return 0; // parse failed
   }
 
-
-	insert_node("env1", VEC4, 0, 0, U, 0);
-	insert_node("env2", VEC4, 0, 0, U, 0);
-	insert_node("env3", VEC4, 0, 0, U, 0);
-	insert_node("gl_FragColor", VEC4, 0, 0, R, 0);
-	insert_node("gl_TexCoord", VEC4, 0, 0, A, 0);
-	insert_node("gl_FragCoord", VEC4, 0, 0, R, 0);
-	insert_node("gl_Color", VEC4, 0, 0, A, 0);
-	insert_node("gl_Secondary", VEC4, 0, 0, A, 0);
-	insert_node("gl_Light_Half", VEC4, 0, 0, U, 0);
-	insert_node("gl_FogFragCoord", VEC4, 0, 0, A, 0);
-	insert_node("gl_Light_Ambient", VEC4, 0, 0, U, 0);
-	insert_node("gl_Material_Shininess", VEC4, 0, 0, U, 0);
-	insert_node("gl_FragDepth", BOOL, 0, 0, R, 0);
+	int g_i = 0;
+	for(g_i = 0; g_i < 255; g_i++){
+		global_dummy_count[g_i] = 0;
+		Test_count[g_i] = 0;
+	}
+	
+	insert_node("env1", VEC4, 0, 0, U, 0, 0);
+	insert_node("env2", VEC4, 0, 0, U, 0, 0);
+	insert_node("env3", VEC4, 0, 0, U, 0, 0);
+	insert_node("gl_FragColor", VEC4, 0, 0, R, 0, 0);
+	insert_node("gl_TexCoord", VEC4, 0, 0, A, 0, 0);
+	insert_node("gl_FragCoord", VEC4, 0, 0, R, 0, 0);
+	insert_node("gl_Color", VEC4, 0, 0, A, 0, 0);
+	insert_node("gl_Secondary", VEC4, 0, 0, A, 0, 0);
+	insert_node("gl_Light_Half", VEC4, 0, 0, U, 0, 0);
+	insert_node("gl_FogFragCoord", VEC4, 0, 0, A, 0, 0);
+	insert_node("gl_Light_Ambient", VEC4, 0, 0, U, 0, 0);
+	insert_node("gl_Material_Shininess", VEC4, 0, 0, U, 0, 0);
+	insert_node("gl_FragDepth", BOOL, 0, 0, R, 0, 0);
 	symbol_table(ast);
 	print_symbol_table(Head);
 
