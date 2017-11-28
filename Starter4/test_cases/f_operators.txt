@@ -11,7 +11,7 @@
 
 	/*myInt1 = myBool1 + 2;/*non arithmetic arithmetic operand*/
 
-	/*if(myBool2 > myBool1);*//*non arithmetic comparison operand*/
+	if(myBool2 > myBool1);/*non arithmetic comparison operand*/
 
 
 }

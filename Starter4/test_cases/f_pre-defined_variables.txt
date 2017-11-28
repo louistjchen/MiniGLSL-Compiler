@@ -7,11 +7,10 @@
 	 }
 
 	 {
-	 	vec4 a;
-		vec4 b;
-		a = gl_Light_Half;
-	 	/*gl_TexCoord = a;*//*attribut type is read only*/
-	 	/*gl_Light_Half = b;*//*uniform type is read only*/
+	 	vec4 a; vec4 b;
+	 	gl_TextCoord = a;/*attribut type is read only*/
+	 	gl_Light_Half = b;/*uniform type is read only*/
+
 	 }	
 	 
 	 {

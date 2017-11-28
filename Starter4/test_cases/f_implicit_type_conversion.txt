@@ -3,16 +3,16 @@
 	/*examples of implicit type conversions which are not supported*/
 	
 	/*incorrect declarations*/
-	int myInt = 4; /*int myInt = 4.0;*/
-	float myFloat = 4.0; /*float myFloat = 4;*/
-	bool myBool = true; /*bool myBool = 1;*/
-	vec2 myVec1 = vec2(1.0,5.0); /*vec2 myVec1 = vec2(1,5.0);*/
+	int myInt = 4.0;
+	float myFloat = 4;
+	bool myBool = 1;
+	vec2 myVec1 = vec2(1,5.0);
 
 	/*incorrect operations*/
 	vec2 myVec = vec2(1.0,5.0);
-	myVec = myVec * myVec;/*vectors and scalars should match types in operations*/
+	myVec = myVec * myInt;/*vectors and scalars should match types in operations*/
 	{
 		int notBool = 0;
-		if(true) notBool = 1;
+		if(notBool) notBool = 2;
 	}
 }

@@ -7,35 +7,33 @@
 		ivec2 b;
 		ivec2 c;
 
-		/*c = a+b;*/
+		c = a+b;
 	}
 		
 	{	/*powers*/
 		int a;
 		ivec2 b;
 		int c;
-		/*c = a^b;*/
+		c = a^b;
 	}
 
 	{	/*logical*/
 		int a;
 		ivec2 b;
 		bool c;
-		/*c = a||b;*/
+		c = a||b;
 	}
 
 	{	/*comparison*/
-		/*ivec2 a;*/
-		/*ivec2 b;*/
-		float a;
-		float b;
+		ivec2 a;
+		ivec2 b;
 		bool c;
 		c = a<b;
 	}
 
 	{	/*comparison*/
 		ivec2 a;
-		ivec2 b;
+		int b;
 		bool c;
 		c = a==b;
 	}

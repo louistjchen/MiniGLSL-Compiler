@@ -14,7 +14,7 @@
 	bool bool1 = !true; 	/*unary expression*/
 	vec2 myVec = vec2(2.0,3.0);
 	vec3 myVec3 = vec3(2.0,3.0,0.0);
-	vec4 myVec4 = vec4(1.0,2.0,3.0,4.0);	/*arguments_opt is epsilon -> default values should be set to 0 as per MiniGSL language*/
+	vec4 myVec4 = vec4();	/*arguments_opt is epsilon -> default values should be set to 0 as per MiniGSL language*/
 	ivec3 myIvec3 = ivec3(1,2,3); 
 	ivec4 myIvec4 = ivec4(1,2,3,4); 
 	bvec4 myBvec = bvec4(true, true, true, false);
@@ -37,7 +37,7 @@
 	{
 		/*test binary expressions*/
 		bool1 = bool1 && true;
-		myBvec[0] = bool1 && myBvec[1];
+		myBvec[0] = bool1 != myBvec[1];
 		int1 = myIvec3[2];
 		any = 1;
 		if((any<2)&&(any>0)&&(any>=-5)&&(any<=1)||(any==(222))) any=552;
