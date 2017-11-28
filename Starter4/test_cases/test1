@@ -3,6 +3,7 @@
 	bool t;
 	bool btemp = false;
 	int y = 8;
+	int g;
 	ivec2 left = ivec2(4,3);
 	ivec2 right = ivec2(1,0);
 	ivec2 dest;
@@ -12,13 +13,12 @@
 	dest = left + right;
 	t = false;
 
-
 	if(true){
-		int g = 9;
+		int g;
 		y = g;
 	}
 	else{
-		int g = 3;
+		int g;
 		y = g;
 	}
 }

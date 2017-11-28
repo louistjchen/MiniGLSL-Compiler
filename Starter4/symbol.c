@@ -60,12 +60,10 @@ int is_declared(char* Name, long Scope, long Line_num){
 	
 	Cur = Head;
 	while(Cur != NULL){
-		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope <= Scope)){
+		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope <= Scope))
 			if(Cur->Line_num <= Line_num)
 				return Cur->Type;
-		}
-		else
-			Cur = Cur->Next;
+		Cur = Cur->Next;
 	}
 	return -1;
 }
@@ -76,12 +74,10 @@ int is_existed(char* Name, long Scope, long Line_num){
 	
 	Cur = Head;
 	while(Cur != NULL){
-		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope == Scope)){
-			if(Cur->Line_num <= Line_num)
+		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope == Scope))
+			if(Cur->Line_num < Line_num)
 				return Cur->Type;
-		}
-		else
-			Cur = Cur->Next;
+		Cur = Cur->Next;
 	}
 	return -1;
 }

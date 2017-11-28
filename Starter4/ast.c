@@ -278,49 +278,49 @@ void ast_print(node * ast) {
 			printf("\n ( DECLARATIONS ");
 			ast_print(ast->declarations.declarations);
 			ast_print(ast->declarations.declaration);
-			printf(" ) \n");
+			printf(" )");
 			break;
 		case STATEMENTS:
 			printf("\n ( STATEMENTS ");
 			ast_print(ast->statements.statements);
 			ast_print(ast->statements.statement);
-			printf(" ) \n");
+			printf(" )");
 			break;
 		case DECLARATION:
 			printf("\n ( DECLARATION %s ", ast->declaration.identifier);
 			ast_print(ast->declaration.type);
-			printf(" ) \n");
+			printf(" )");
 			break;
 		case DECLARATION_ASSIGN:
 			printf("\n ( DECLARATION %s ", ast->declaration.identifier);
 			ast_print(ast->declaration_assign.type);
 			ast_print(ast->declaration_assign.expression);
-			printf(" ) \n");
+			printf(" )");
 			break;
 		case DECLARATION_ASSIGN_CONST:
 			printf("\n ( DECLARATION %s ", ast->declaration.identifier);
 			ast_print(ast->declaration_assign_const.type);
 			ast_print(ast->declaration_assign_const.expression);
-			printf(" ) \n");
+			printf(" )");
 			break;
 		case STATEMENT_ASSIGN:
 			printf("\n ( ASSIGN ");
 			ast_print(ast->statement_assign.variable);
 			ast_print(ast->statement_assign.expression);
-			printf(" ) \n");
+			printf(" )");
 			break;
 		case STATEMENT_IF_ELSE:
 			printf("\n ( IF ");
 			ast_print(ast->statement_if_else.expression);
 			ast_print(ast->statement_if_else.statement_valid);
 			ast_print(ast->statement_if_else.statement_invalid);
-			printf(" ) \n");
+			printf(" )");
 			break;
 		case STATEMENT_IF:
 			printf("\n ( IF ");
 			ast_print(ast->statement_if.expression);
 			ast_print(ast->statement_if.statement_valid);
-			printf(" ) \n");
+			printf(" )");
 			break;
 		case TYPE:
 			switch(ast->type.type) {
@@ -344,7 +344,7 @@ void ast_print(node * ast) {
 			printf("\n (CALL ");
 			ast_print(ast->expression_type.type);
 			ast_print(ast->expression_type.arguments);
-			printf(" ) \n");
+			printf(" )");
 			break;
 		case EXPRESSION_FUNC:
 			printf("\n (CALL ");
@@ -355,7 +355,7 @@ void ast_print(node * ast) {
 				default: printf(" DEFAULT-FUNC "); break;
 			}
 			ast_print(ast->expression_func.arguments);
-			printf(" ) \n");
+			printf(" )");
 			break;
 		case EXPRESSION_UNARY:
 			printf("\n (UNARY ");
@@ -365,7 +365,7 @@ void ast_print(node * ast) {
 				default: printf("DEFAULT-UNARY"); break;
 			}
 			ast_print(ast->expression_unary.right);
-			printf(" ) \n");
+			printf(" )");
 			break;
 		case EXPRESSION_BINARY:
 			printf("\n (BINARY ");
@@ -387,7 +387,7 @@ void ast_print(node * ast) {
 			}
 			ast_print(ast->expression_binary.left);
 			ast_print(ast->expression_binary.right);
-			printf(" ) \n ");
+			printf(" )");
 			break;
 		case EXPRESSION_BOOL_VALUE:
 			if(ast->expression_bool_value.bool_value == 0)
@@ -411,7 +411,7 @@ void ast_print(node * ast) {
 			printf(" %s ", ast->variable.identifier);
 			break;
 		case ARRAY:
-			printf("\n (INDEX %s %d ) \n", ast->array.identifier, ast->array.index);
+			printf("\n (INDEX %s %d )", ast->array.identifier, ast->array.index);
 			break;
 		case ARGUMENTS_MORE_THAN_ONE:
 			ast_print(ast->arguments_more_than_one.arguments_more_than_one);

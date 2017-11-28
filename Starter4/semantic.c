@@ -43,12 +43,13 @@ int semantic_check( node *ast) {
 			break;
 		case DECLARATION:
 			temp = is_existed(ast->declaration.identifier, scopesem, ast->declaration.ln);
-			// id exists
-			if(temp >= 0)
+			// id does not exist in current scope
+			if(temp < 0)
 				// check its type
 				return semantic_check(ast->declaration.type);
+			// id already exists in current scope
 			else {
-				printf("Semantic error (declaration identifier not declared) occurs at line %d\n", ast->declaration.ln);
+				printf("Semantic error (declaration identifier already declared) occurs at line %d\n", ast->declaration.ln);
 				return -1;
 			}
 			break;
@@ -60,8 +61,8 @@ int semantic_check( node *ast) {
 			else if(ret2 < 0) return -1;
 
 			temp = is_existed(ast->declaration_assign.identifier, scopesem, ast->declaration_assign.ln);
-			// id exists
-			if(temp < 0) {
+			// id already exists in current scope
+			if(temp >= 0) {
 				printf("Semantic error (declaration_assign identifier already declared) occurs at line %d\n", ast->declaration_assign.ln);
 				return -1;
 			}
@@ -143,8 +144,8 @@ int semantic_check( node *ast) {
 			else if(ret2 < 0) return -1;
 
 			temp = is_existed(ast->declaration_assign_const.identifier, scopesem, ast->declaration_assign_const.ln);
-			// id exists
-			if(temp < 0) {
+			// id already exists in current scope
+			if(temp >= 0) {
 				printf("Semantic error 3(declaration_assign_const identifier already declared) occurs at line %d\n", ast->declaration_assign_const.ln);
 				return -1;
 			}
@@ -620,7 +621,15 @@ int semantic_check( node *ast) {
 				if(ret == IVEC2 || ret == BVEC2 || ret == VEC2) {
 					// index is within 0 to 1
 					if(ret2 < 2)
-						return ret;
+						if(ret == IVEC2)
+							return INT;
+						else if(ret == BVEC2)
+							return BOOL;
+						else if(ret == VEC2)
+							return FLOAT;
+						else {
+							printf("Semantic error (vector index unknown vector type) occurs at line %d. Should never get here!\n", ast->array.ln);
+						}
 					// index exceeds 1
 					else {
 						printf("Semantic error (vector index out of range) occurs at line %d\n", ast->array.ln);
@@ -631,7 +640,15 @@ int semantic_check( node *ast) {
 				else if(ret == IVEC3 || ret == BVEC3 || ret == VEC3) {
 					// index is within 0 to 2
 					if(ret2 < 3)
-						return ret;
+						if(ret == IVEC3)
+							return INT;
+						else if(ret == BVEC3)
+							return BOOL;
+						else if(ret == VEC3)
+							return FLOAT;
+						else {
+							printf("Semantic error (vector index unknown vector type) occurs at line %d. Should never get here!\n", ast->array.ln);
+						}
 					// index exceeds 2
 					else {
 						printf("Semantic error (vector index out of range) occurs at line %d\n", ast->array.ln);
@@ -642,7 +659,15 @@ int semantic_check( node *ast) {
 				else if(ret == IVEC4 || ret == BVEC4 || ret == VEC4) {
 					// index is within 0 to 3
 					if(ret2 < 4)
-						return ret;
+						if(ret == IVEC4)
+							return INT;
+						else if(ret == BVEC4)
+							return BOOL;
+						else if(ret == VEC4)
+							return FLOAT;
+						else {
+							printf("Semantic error (vector index unknown vector type) occurs at line %d. Should never get here!\n", ast->array.ln);
+						}
 					// index exceeds 3
 					else {
 						printf("Semantic error (vector index out of range) occurs at line %d\n", ast->array.ln);

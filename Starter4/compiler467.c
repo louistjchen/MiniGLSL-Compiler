@@ -106,7 +106,7 @@ int main (int argc, char *argv[]) {
 	insert_node("gl_Material_Shininess", VEC4, 0, 0, U);
 	insert_node("gl_FragDepth", BOOL, 0, 0, R);
 	symbol_table(ast);
-	print_symbol_table(Head);
+//	print_symbol_table(Head);
 
 	int ret_semantic = semantic_check(ast);
 	if(ret_semantic == -1)
