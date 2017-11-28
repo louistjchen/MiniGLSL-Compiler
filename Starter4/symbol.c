@@ -87,6 +87,7 @@ int is_existed(char* Name, long Scope, long Line_num){
 	while(Cur != NULL){
 		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope == 0))
 			return Cur->Attribution;
+		Cur = Cur->Next;
 	}
 	
 	Temp = NULL;
