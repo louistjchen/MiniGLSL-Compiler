@@ -6,12 +6,16 @@
 	int myInt2 = 2;
 	bool myBool2 = false;
 
-	/* examples of operator use that is not supported *?
-	if(myInt1 || myInt) myInt = 3; /*non boolean logical operand*/
+	/* examples of operator use that is not supported */
+
+
+	if(myInt1 + myInt) {
+		myInt = 3; 
+	}
 
 	/*myInt1 = myBool1 + 2;/*non arithmetic arithmetic operand*/
 
-	if(myBool2 > myBool1);/*non arithmetic comparison operand*/
+	/*if(myBool2 || myBool1);*//*non arithmetic comparison operand*/
 
 
 }

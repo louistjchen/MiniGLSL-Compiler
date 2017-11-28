@@ -1,12 +1,10 @@
 {
 int a;
 	if(false) {
-		int a;
-		a = 4;
+		int a = 4;
 	}
-	else {
-		int a;
-		a = 4;
-	}
+	else 
+		a = 1;
+	
 
 }

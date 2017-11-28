@@ -37,7 +37,7 @@
 	{
 		/*test binary expressions*/
 		bool1 = bool1 && true;
-		myBvec[0] = bool1 != myBvec[1];
+		myBvec[0] = bool1 || myBvec[1];
 		int1 = myIvec3[2];
 		any = 1;
 		if((any<2)&&(any>0)&&(any>=-5)&&(any<=1)||(any==(222))) any=552;

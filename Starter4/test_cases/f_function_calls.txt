@@ -5,14 +5,14 @@
 		float a;
 		bool b;
 
-		a = rsq(b);/*invalid arg type*/
+		a = rsq(a);/*invalid arg type*/
 	}
 
 	{
 		vec4 myVec4;
 		int a;
 
-		a = dp3(myVec4, myVec4);/*incorrect return type*/
+		myVec4 = dp3(myVec4, myVec4);/*incorrect return type*/
 
 	}
 

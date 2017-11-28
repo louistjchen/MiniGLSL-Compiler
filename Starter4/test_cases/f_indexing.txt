@@ -6,7 +6,7 @@
 	bool myBool;
 	int myInt;
 
-	myBool = myVec[4];/*out of bounds*/
-	myInt = myVec1[3];/*type mismatch*/
+	myBool = myVec[2];/*out of bounds*/
+	myVec[0] = myVec1[3];/*type mismatch*/
 
 }

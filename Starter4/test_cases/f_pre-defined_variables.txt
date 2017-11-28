@@ -8,15 +8,17 @@
 
 	 {
 	 	vec4 a; vec4 b;
-	 	gl_TextCoord = a;/*attribut type is read only*/
-	 	gl_Light_Half = b;/*uniform type is read only*/
+	 	/*gl_TexCoord = a;/*attribut type is read only*/
+	 	/*gl_Light_Half = b;/*uniform type is read only*/
 
 	 }	
 	 
 	 {
-	 	bool a = gl_FragDepth; /*result type is write only, in declaration*/
-	 	const vec4 b = gl_Secondary; /*attribute type is non constant*/
-		a = gl_FragDepth; /*result type is write only, in statement*/
+	 	/*bool a = gl_FragDepth; /*result type is write only, in declaration*/
+		bool a;
+		const vec4 myVec = gl_Light_Half;
+	 	/*const vec4 b = gl_Secondary; /*attribute type is non constant*/
+		/*a = gl_FragDepth; /*result type is write only, in statement*/
 	 }
 
 

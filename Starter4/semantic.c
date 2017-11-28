@@ -70,8 +70,8 @@ int semantic_check( node *ast) {
 			}
 
 			// expression assign validity
-			if(ast->declaration_assign.expression->kind == VARIABLE) {
-				temp = get_attribution(ast->declaration_assign.identifier);
+			if(ast->declaration_assign.expression->kind == EXPRESSION_VARIABLE) {
+				temp = get_attribution(ast->declaration_assign.expression->expression_variable.variable->variable.identifier);
 				if(temp == 900) {
 					printf("Semantic error (declaration_assign result can't be read) occurs at line %d\n", ast->declaration_assign.ln);
 					return -1;
@@ -153,12 +153,22 @@ int semantic_check( node *ast) {
 			}
 
 			// expression assign validity
-			if(ast->declaration_assign_const.expression->kind == VARIABLE) {
-				temp = get_attribution(ast->declaration_assign_const.identifier);
+			if(ast->declaration_assign_const.expression->kind == EXPRESSION_VARIABLE) {
+				temp = get_attribution(ast->declaration_assign_const.expression->expression_variable.variable->variable.identifier);
 				if(temp == 900) {
 					printf("Semantic error (declaration_assign_const result can't be read) occurs at line %d\n", ast->declaration_assign_const.ln);
 					return -1;
 				}
+				if(temp == 901) {
+					printf("Semantic error (declaration_assign_const attribute can't be assigned to const) occurs at line %d\n", ast->declaration_assign_const.ln);
+					return -1;
+				}
+			}
+			
+			// assign a none single-literal number to const, error out
+			if(ast->declaration_assign_const.expression->kind == EXPRESSION_BINARY) {
+				printf("Semantic error (declaration_assign_const expression is a binary expression) occurs at line %d\n", ast->declaration_assign_const.ln);
+				return -1;
 			}
 
 			// assign type validity
@@ -234,8 +244,8 @@ int semantic_check( node *ast) {
 			}
 
 			// right variable assign validity
-			if(ast->statement_assign.expression->kind == VARIABLE) {
-				temp = get_attribution(ast->statement_assign.expression->variable.identifier);
+			if(ast->statement_assign.expression->kind == EXPRESSION_VARIABLE) {
+				temp = get_attribution(ast->statement_assign.expression->expression_variable.variable->variable.identifier);
 				if(temp == 900) {
 					printf("Semantic error (statement_assign result can't be read) occurs at line %d\n", ast->statement_assign.ln);
 					return -1;
@@ -244,10 +254,19 @@ int semantic_check( node *ast) {
 			// left variable assign validity
 			if(ast->statement_assign.variable->kind == VARIABLE) {
 				temp = get_attribution(ast->statement_assign.variable->variable.identifier);
-				if(temp == 901 || temp == 902 || temp == 904) {
+				if(temp == 901) {
+					printf("Semantic error (statement_assign write to attribute) occurs at line %d\n", ast->statement_assign.ln);
+					return -1;
+				}
+				if(temp == 902) {
+					printf("Semantic error (statement_assign write to uniform) occurs at line %d\n", ast->statement_assign.ln);
+					return -1;
+				}
+				if(temp == 904) {
 					printf("Semantic error (statement_assign write to const) occurs at line %d\n", ast->statement_assign.ln);
 					return -1;
 				}
+
 			}
 
 			// assign type validity
