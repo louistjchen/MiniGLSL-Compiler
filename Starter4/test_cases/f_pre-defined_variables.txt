@@ -1,0 +1,23 @@
+{
+	/*examples of pre-defined variable uses which are not supported*/
+
+	if(true){
+		vec4 a;
+		gl_FragColor = a; /*result type cannot be assigned anywhere in the scope of an if/else statement*/
+	 }
+
+	 {
+	 	vec4 a; vec4 b;
+	 	gl_TextCoord = a;/*attribut type is read only*/
+	 	gl_Light_Half = b;/*uniform type is read only*/
+
+	 }	
+	 
+	 {
+	 	bool a = gl_FragDepth; /*result type is write only, in declaration*/
+	 	const vec4 b = gl_Secondary; /*attribute type is non constant*/
+		a = gl_FragDepth; /*result type is write only, in statement*/
+	 }
+
+
+}

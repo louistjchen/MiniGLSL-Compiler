@@ -1,0 +1,11 @@
+{
+
+const int testint = 1;
+
+ bool b = true;
+ bool d = false;
+ if(true){
+ 	testint = 2;
+ }
+
+ }
