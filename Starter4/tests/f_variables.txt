@@ -1,0 +1,22 @@
+{
+	
+	/*examples of variable uses which are not supported*/
+
+	int a = 1;
+	int a = 2;/*variables should only be declared once in same scope*/
+
+	const int b = 2;
+	b = 5;/*const vars cannot be reassigned*/
+
+	d = 3;/*variable not declared*/
+
+	{int c = 5;
+	 bool error;
+		{
+			int c = 3;
+			if(c==5) error = true;
+
+		}
+	 if(c==3) error = true;
+	}
+}

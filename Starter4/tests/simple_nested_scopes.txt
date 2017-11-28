@@ -1,0 +1,6 @@
+{
+    int temp_scope1 = 10;
+    {
+        int temp_scope2 = 20;
+    }
+}
