@@ -24,8 +24,9 @@ int semantic_check( node *ast) {
 
 		case PROGRAM:
 			scopesem++;
-			return semantic_check(ast->program.scope);
+			ret = semantic_check(ast->program.scope);
 			scopesem--;
+			return ret;
 			break;
 		case SCOPE:
 			if(semantic_check(ast->scope.declarations) == -1) { return -1;}
@@ -323,14 +324,14 @@ int semantic_check( node *ast) {
 				return ret;
 			break;
 		case STATEMENT_IF:
-			ret = semantic_check(ast->statement_if_else.expression);
+			ret = semantic_check(ast->statement_if.expression);
 			if(ret < 0) return -1;
 
 			if(ret != BOOL) {
-				printf("Semantic error (statement_if_else condition not boolean type) occurs at line %d\n", ast->statement_if_else.ln);
+				printf("Semantic error (statement_if condition not boolean type) occurs at line %d\n", ast->statement_if.ln);
 				return -1;
 			}
-			else if(semantic_check(ast->statement_if_else.statement_valid) < 0)
+			else if(semantic_check(ast->statement_if.statement_valid) < 0)
 				return -1;
 			else
 				return ret;
