@@ -45,6 +45,62 @@ void insert_node(char* Name, int Type, long Line_num, long Scope, attr Attributi
 	}
 }
 
+char* print_type(char* Name, long Scope, int Line_num){
+	L_node* Cur;
+	Cur = Head;
+	int var_type = 0;
+	while(Cur != NULL){
+		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope <= Scope) && (Cur->Line_num <= Line_num)){
+			// At parent scope
+			if(Cur->Scope < Scope){
+				var_type = Cur->Type;
+			}
+			// At current scope
+			else if(Cur->Test == printScopeDummy[Scope]){
+				var_type = Cur->Type;
+				break;
+			}
+		}
+		Cur = Cur->Next;
+	}
+	if(var_type == 0){
+		printf("Error!\n");
+		return "ERROR";
+	}
+	switch (var_type){
+		case 100:
+			return "INT";
+		case 101:
+			return "IVEC2";
+		case 102:
+			return "IVEC3";
+		case 103:
+			return "IVEC4";
+		case 104:
+			return "FLOAT";
+		case 105:
+			return "VEC2";
+		case 106:
+			return "VEC3";
+		case 107:
+			return "VEC4";
+		case 108:
+			return "BOOL";
+		case 109:
+			return "BVEC2";
+		case 110:
+			return "BVEC3";
+		case 111:
+			return "BVEC4";
+		case 112:
+			return "FUNCTION";
+		default:
+			return "ERROR";
+	}
+	return "ERROR";
+}
+
+
 int get_attribution(char* Name){
 	L_node* Cur;
 	
@@ -63,11 +119,12 @@ int get_attribution(char* Name){
 int is_declared(char* Name, long Scope, long Line_num){
 	L_node* Cur;
 	Cur = Head;
+	int Temp = 0;
 	while(Cur != NULL){
 		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope <= Scope) && (Cur->Line_num <= Line_num)){
 			// At parent scope
 			if(Cur->Scope < Scope){
-				return Cur->Type;
+				Temp = Cur->Type;
 			}
 			// At current scope
 			else if(Cur->Test == global_dummy_count[Scope])
@@ -75,6 +132,8 @@ int is_declared(char* Name, long Scope, long Line_num){
 		}
 		Cur = Cur->Next;
 	}
+	if (Temp != 0)
+		return Temp;
 	return -1;
 }
 

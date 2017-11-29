@@ -66,6 +66,7 @@ void symbol_table(node* ast);
 void print_symbol_table(L_node* List_head);
 int get_attribution(char* Name);
 int is_existed(char* Name, long Scope, long Line_num);
+char* print_type(char* Name, long Scope, int Line_num);
 
 
 #endif
