@@ -1,0 +1,19 @@
+{
+	/*examples of function calls which are not supported*/	
+
+	{
+		float a;
+		bool b;
+
+		a = rsq(a);/*invalid arg type*/
+	}
+
+	{
+		vec4 myVec4;
+		int a;
+
+		myVec4 = dp3(myVec4, myVec4);/*incorrect return type*/
+
+	}
+
+}

@@ -1,0 +1,19 @@
+{
+	int a = 1;
+	{
+		int b = 2;
+	}
+	{
+		int b = 3;
+		b = 3;
+	}
+	if(false) {int a = 2;}
+	else a = 4;
+	{
+		int a = 5;
+	}
+	if(true) {int a = 5;}
+	else a = 6;
+	if(true) {a = 10;}
+	else b = 13;
+}

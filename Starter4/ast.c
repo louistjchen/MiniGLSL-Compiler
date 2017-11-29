@@ -14,13 +14,15 @@
 #include <string.h>
 
 #include "ast.h"
+#include "symbol.h"
 #include "common.h"
 #include "parser.tab.h"
 
 #define DEBUG_PRINT_TREE 0
 
 node *ast = NULL;
-int sscope = 0;
+long printScope = 0;
+long printScopeDummy[255];
 
 node *ast_allocate(node_kind kind, ...) {
 	va_list args;
@@ -266,9 +268,12 @@ void ast_print(node * ast) {
   	switch(ast->kind) {
 
 		case PROGRAM:
+			printScope++;
+			printScopeDummy[printScope]++;
 			printf("\n ( SCOPE ");
 			ast_print(ast->program.scope);
 			printf(" ) \n");
+			printScope--;
 			break;
 		case SCOPE:
 			ast_print(ast->scope.declarations);
@@ -408,7 +413,7 @@ void ast_print(node * ast) {
 			ast_print(ast->expression_variable.variable);
 			break;
 		case VARIABLE:
-			printf(" %s ", ast->variable.identifier);
+			printf(" %s %s ", print_type(ast->variable.identifier, printScope, ast->variable.ln), ast->variable.identifier);
 			break;
 		case ARRAY:
 			printf("\n (INDEX %s %d )", ast->array.identifier, ast->array.index);

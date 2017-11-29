@@ -46,24 +46,27 @@ typedef struct L_node{
 	int Type;
 	long Line_num;
 	long Scope;
-	
+	long Count;
+	long Test;
 	struct L_node* Next;
 }L_node;
 
 
 extern L_node* Head;
 extern long Scope_num;
+extern long global_dummy_count[255];
+extern long Test_count[255];
 
 
 
 // Functions
-void insert_node(char* Name, int Type, long Line_num, long Scope, attr Attribution);
-int get_nodeType(char* Name, long Scope);
+void insert_node(char* Name, int Type, long Line_num, long Scope, attr Attribution, long Count, long Test);
 int is_declared(char* Name, long Scope, long Line_num);
 void symbol_table(node* ast);
 void print_symbol_table(L_node* List_head);
 int get_attribution(char* Name);
 int is_existed(char* Name, long Scope, long Line_num);
+char* print_type(char* Name, long Scope, int Line_num);
 
 
 #endif

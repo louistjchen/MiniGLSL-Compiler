@@ -1,0 +1,11 @@
+{
+		int myInt;
+		vec3 myVec = vec3(1.0,2.0,3.0);
+		vec3 myVec1 = vec3(1.1,2.2,3.3);
+		vec2 myVec2 = vec2(1.9,2.3);
+		
+		/*examples of operator use that is not supported*/
+		myVec = myVec*myVec; /*binary operands must be of same base type*/
+		myVec1[1] = myVec1[2] + myVec2[0];/*binary operands must of same order if both are vectors*/ 
+
+}

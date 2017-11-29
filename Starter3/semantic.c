@@ -24,8 +24,10 @@ int semantic_check( node *ast) {
 
 		case PROGRAM:
 			scopesem++;
-			return semantic_check(ast->program.scope);
+			global_dummy_count[scopesem]++;
+			ret = semantic_check(ast->program.scope);
 			scopesem--;
+			return ret;
 			break;
 		case SCOPE:
 			if(semantic_check(ast->scope.declarations) == -1) { return -1;}
@@ -43,12 +45,13 @@ int semantic_check( node *ast) {
 			break;
 		case DECLARATION:
 			temp = is_existed(ast->declaration.identifier, scopesem, ast->declaration.ln);
-			// id not exists
+			// id does not exist in current scope
 			if(temp < 0)
 				// check its type
 				return semantic_check(ast->declaration.type);
+			// id already exists in current scope
 			else {
-				printf("Semantic error 1(declaration identifier already declared) occurs at line %d\n", ast->declaration.ln);
+				printf("Semantic error (declaration identifier already declared) occurs at line %d\n", ast->declaration.ln);
 				return -1;
 			}
 			break;
@@ -60,15 +63,15 @@ int semantic_check( node *ast) {
 			else if(ret2 < 0) return -1;
 
 			temp = is_existed(ast->declaration_assign.identifier, scopesem, ast->declaration_assign.ln);
-			// id exists
-			if(temp < 0) {
-				printf("Semantic error 2(declaration_assign identifier already declared) occurs at line %d\n", ast->declaration_assign.ln);
+			// id already exists in current scope
+			if(temp >= 0) {
+				printf("Semantic error (declaration_assign identifier already declared) occurs at line %d\n", ast->declaration_assign.ln);
 				return -1;
 			}
 
 			// expression assign validity
-			if(ast->declaration_assign.expression->kind == VARIABLE) {
-				temp = get_attribution(ast->declaration_assign.identifier);
+			if(ast->declaration_assign.expression->kind == EXPRESSION_VARIABLE) {
+				temp = get_attribution(ast->declaration_assign.expression->expression_variable.variable->variable.identifier);
 				if(temp == 900) {
 					printf("Semantic error (declaration_assign result can't be read) occurs at line %d\n", ast->declaration_assign.ln);
 					return -1;
@@ -143,19 +146,29 @@ int semantic_check( node *ast) {
 			else if(ret2 < 0) return -1;
 
 			temp = is_existed(ast->declaration_assign_const.identifier, scopesem, ast->declaration_assign_const.ln);
-			// id exists
-			if(temp < 0) {
+			// id already exists in current scope
+			if(temp >= 0) {
 				printf("Semantic error 3(declaration_assign_const identifier already declared) occurs at line %d\n", ast->declaration_assign_const.ln);
 				return -1;
 			}
 
 			// expression assign validity
-			if(ast->declaration_assign_const.expression->kind == VARIABLE) {
-				temp = get_attribution(ast->declaration_assign_const.identifier);
+			if(ast->declaration_assign_const.expression->kind == EXPRESSION_VARIABLE) {
+				temp = get_attribution(ast->declaration_assign_const.expression->expression_variable.variable->variable.identifier);
 				if(temp == 900) {
 					printf("Semantic error (declaration_assign_const result can't be read) occurs at line %d\n", ast->declaration_assign_const.ln);
 					return -1;
 				}
+				if(temp == 901) {
+					printf("Semantic error (declaration_assign_const attribute can't be assigned to const) occurs at line %d\n", ast->declaration_assign_const.ln);
+					return -1;
+				}
+			}
+			
+			// assign a none single-literal number to const, error out
+			if(ast->declaration_assign_const.expression->kind == EXPRESSION_BINARY) {
+				printf("Semantic error (declaration_assign_const expression is a binary expression) occurs at line %d\n", ast->declaration_assign_const.ln);
+				return -1;
 			}
 
 			// assign type validity
@@ -231,8 +244,8 @@ int semantic_check( node *ast) {
 			}
 
 			// right variable assign validity
-			if(ast->statement_assign.expression->kind == VARIABLE) {
-				temp = get_attribution(ast->statement_assign.expression->variable.identifier);
+			if(ast->statement_assign.expression->kind == EXPRESSION_VARIABLE) {
+				temp = get_attribution(ast->statement_assign.expression->expression_variable.variable->variable.identifier);
 				if(temp == 900) {
 					printf("Semantic error (statement_assign result can't be read) occurs at line %d\n", ast->statement_assign.ln);
 					return -1;
@@ -241,10 +254,19 @@ int semantic_check( node *ast) {
 			// left variable assign validity
 			if(ast->statement_assign.variable->kind == VARIABLE) {
 				temp = get_attribution(ast->statement_assign.variable->variable.identifier);
-				if(temp == 901 || temp == 902 || temp == 904) {
+				if(temp == 901) {
+					printf("Semantic error (statement_assign write to attribute) occurs at line %d\n", ast->statement_assign.ln);
+					return -1;
+				}
+				if(temp == 902) {
+					printf("Semantic error (statement_assign write to uniform) occurs at line %d\n", ast->statement_assign.ln);
+					return -1;
+				}
+				if(temp == 904) {
 					printf("Semantic error (statement_assign write to const) occurs at line %d\n", ast->statement_assign.ln);
 					return -1;
 				}
+
 			}
 
 			// assign type validity
@@ -322,14 +344,14 @@ int semantic_check( node *ast) {
 				return ret;
 			break;
 		case STATEMENT_IF:
-			ret = semantic_check(ast->statement_if_else.expression);
+			ret = semantic_check(ast->statement_if.expression);
 			if(ret < 0) return -1;
 
 			if(ret != BOOL) {
-				printf("Semantic error (statement_if_else condition not boolean type) occurs at line %d\n", ast->statement_if_else.ln);
+				printf("Semantic error (statement_if condition not boolean type) occurs at line %d\n", ast->statement_if.ln);
 				return -1;
 			}
-			else if(semantic_check(ast->statement_if_else.statement_valid) < 0)
+			else if(semantic_check(ast->statement_if.statement_valid) < 0)
 				return -1;
 			else
 				return ret;
@@ -343,35 +365,72 @@ int semantic_check( node *ast) {
 			if(ret < 0) return ret;
 			else if(ret2 < 0) return ret2;
 
-			if(ret == ret2) return ret;
-
 			numArgs = numArguments(ast->expression_type.arguments);
 			if(ret == INT || ret == FLOAT || ret == BOOL) {
-				if(numArgs == 1)
+				if(numArgs == 1 && ret == ret2)
 					return ret;
-				else {
+				else if(ret != ret2){
+					printf("Semantic error (expression_type assign wrong scalar type to a scalar) occurs at line %d\n", ast->expression_type.ln);
+					return -1;
+				}
+				else{
 					printf("Semantic error (expression_type assign a vector to a scalar type) occurs at line %d\n", ast->expression_type.ln);
 					return -1;
 				}
 			}
 			else if(ret == IVEC2 || ret == VEC2 || ret == BVEC2) {
 				if(numArgs == 2)
-					return ret;
+					if(ret == IVEC2 && ret2 == INT)
+						return ret;
+					else if(ret == VEC2 && ret2 == FLOAT)
+						return ret;
+					else if(ret == BVEC2 && ret2 == BOOL)
+						return ret;
+					else {	
+						printf("Semantic error (expression_type assign wrong i/b/vec2 type to a i/b/vec2) occurs at line %d\n", ast->expression_type.ln);
+						return -1;
+					}
 				else {
-					printf("Semantic error (expression_type assign more than 2 args for IVEC2/BVEC2/VEC2) occurs at line %d\n", ast->expression_type.ln);
+					printf("Semantic error (expression_type assign not 2 args for IVEC2/BVEC2/VEC2) occurs at line %d\n", ast->expression_type.ln);
 					return -1;
 				}
 			}
 			else if(ret == IVEC3 || ret == VEC3 || ret == BVEC3) {
 				if(numArgs == 3)
-					return ret;
+					if(ret == IVEC3 && ret2 == INT)
+						return ret;
+					else if(ret == VEC3 && ret2 == FLOAT)
+						return ret;
+					else if(ret == BVEC3 && ret2 == BOOL)
+						return ret;
+					else {	
+						printf("Semantic error (expression_type assign wrong i/b/vec3 type to a i/b/vec3) occurs at line %d\n", ast->expression_type.ln);
+						return -1;
+					}
 				else {
-					printf("Semantic error (expression_type assign more than 3 args for IVEC3/BVEC3/VEC3) occurs at line %d\n", ast->expression_type.ln);
+					printf("Semantic error (expression_type assign not 3 args for IVEC3/BVEC3/VEC3) occurs at line %d\n", ast->expression_type.ln);
+					return -1;
+				}
+			}
+			else if(ret == IVEC4 || ret == VEC4 || ret == BVEC4) {
+				if(numArgs == 4)
+					if(ret == IVEC4 && ret2 == INT)
+						return ret;
+					else if(ret == VEC4 && ret2 == FLOAT)
+						return ret;
+					else if(ret == BVEC4 && ret2 == BOOL)
+						return ret;
+					else {	
+						printf("Semantic error (expression_type assign wrong i/b/vec4 type to a i/b/vec4) occurs at line %d\n", ast->expression_type.ln);
+						return -1;
+					}
+				else {
+					printf("Semantic error (expression_type assign not 4 args for IVEC4/BVEC4/VEC4) occurs at line %d\n", ast->expression_type.ln);
 					return -1;
 				}
 			}
 			else {
-				printf("Semantic error (expression_type unknown type) occurs at line\n");
+				printf("Semantic error (expression_type unknown type) occurs at line %d. If you see this, then you're in trouble\n", ast->expression_type.ln);
 				return -1;
 			}
 
@@ -448,7 +507,7 @@ int semantic_check( node *ast) {
 			if(ast->expression_binary.op == BINARY_AND || ast->expression_binary.op == BINARY_OR) {
 				if(ret == ret2) {
 					if(ret == BOOL || ret == BVEC2 || ret == BVEC3 || ret == BVEC4)
-						return ret;
+						return BOOL;
 					else {
 						printf("Semantic error (expression_binary && || invalid type) occurs at line %d\n", ast->expression_binary.ln);
 						return -1;
@@ -464,7 +523,7 @@ int semantic_check( node *ast) {
 				if(ret == ret2) {
 					// left right both int or float, scalar
 					if(ret == INT || ret == FLOAT)
-						return ret;
+						return BOOL;
 					else {
 						printf("Semantic error (expression_binary < <= > >= invalid type \"not INT or FLOAT\") occurs at line %d\n", ast->expression_binary.ln);
 						return -1;
@@ -480,7 +539,7 @@ int semantic_check( node *ast) {
 				if(ret == ret2) {
 					// left right both int or float, both scalar or vector
 					if(ret == INT || ret == IVEC2 || ret == IVEC3 || ret == IVEC4 || ret == FLOAT || ret == VEC2 || ret == VEC3 || ret == VEC4)
-						return ret;
+						return BOOL;
 					else {
 						printf("Semantic error (expression_binary == != invalid type \"not INT or FLOAT or their vector types\" occurs at line %d\n", ast->expression_binary.ln);
 						return -1;
@@ -583,7 +642,15 @@ int semantic_check( node *ast) {
 				if(ret == IVEC2 || ret == BVEC2 || ret == VEC2) {
 					// index is within 0 to 1
 					if(ret2 < 2)
-						return ret;
+						if(ret == IVEC2)
+							return INT;
+						else if(ret == BVEC2)
+							return BOOL;
+						else if(ret == VEC2)
+							return FLOAT;
+						else {
+							printf("Semantic error (vector index unknown vector type) occurs at line %d. Should never get here!\n", ast->array.ln);
+						}
 					// index exceeds 1
 					else {
 						printf("Semantic error (vector index out of range) occurs at line %d\n", ast->array.ln);
@@ -594,7 +661,15 @@ int semantic_check( node *ast) {
 				else if(ret == IVEC3 || ret == BVEC3 || ret == VEC3) {
 					// index is within 0 to 2
 					if(ret2 < 3)
-						return ret;
+						if(ret == IVEC3)
+							return INT;
+						else if(ret == BVEC3)
+							return BOOL;
+						else if(ret == VEC3)
+							return FLOAT;
+						else {
+							printf("Semantic error (vector index unknown vector type) occurs at line %d. Should never get here!\n", ast->array.ln);
+						}
 					// index exceeds 2
 					else {
 						printf("Semantic error (vector index out of range) occurs at line %d\n", ast->array.ln);
@@ -605,7 +680,15 @@ int semantic_check( node *ast) {
 				else if(ret == IVEC4 || ret == BVEC4 || ret == VEC4) {
 					// index is within 0 to 3
 					if(ret2 < 4)
-						return ret;
+						if(ret == IVEC4)
+							return INT;
+						else if(ret == BVEC4)
+							return BOOL;
+						else if(ret == VEC4)
+							return FLOAT;
+						else {
+							printf("Semantic error (vector index unknown vector type) occurs at line %d. Should never get here!\n", ast->array.ln);
+						}
 					// index exceeds 3
 					else {
 						printf("Semantic error (vector index out of range) occurs at line %d\n", ast->array.ln);
@@ -660,7 +743,9 @@ int numArguments(node *ast) {
 
 	if(ast->kind == ARGUMENTS_MORE_THAN_ONE)
 		return numArguments(ast->arguments_more_than_one.arguments_more_than_one) + 1;
-	else if(ast->kind >= PROGRAM && ast->kind <= ARGUMENTS_OPT)
+	else if(ast->kind == ARGUMENTS_OPT)
+		return numArguments(ast->arguments_opt.arguments);
+	else if(ast->kind >= PROGRAM && ast->kind <= ARGUMENTS_ONLY_ONE)
 		return 1;
 	else {
 		printf("Semantic error (undefined node type)\n");

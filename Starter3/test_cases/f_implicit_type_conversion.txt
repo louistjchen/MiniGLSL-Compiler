@@ -1,0 +1,18 @@
+{
+	
+	/*examples of implicit type conversions which are not supported*/
+	
+	/*incorrect declarations*/
+	int myInt = 4;
+	float myFloat = 4.0;
+	bool myBool = false;
+	vec2 myVec1 = vec2(1.345,5.0);
+
+	/*incorrect operations*/
+	vec2 myVec = vec2(1.0,5.0);
+	myVec = myVec * myVec;/*vectors and scalars should match types in operations*/
+	{
+		int notBool = 0;
+		if(notBool == 0) notBool = 2;
+	}
+}

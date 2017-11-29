@@ -95,6 +95,7 @@ int main (int argc, char *argv[]) {
 	for(g_i = 0; g_i < 255; g_i++){
 		global_dummy_count[g_i] = 0;
 		Test_count[g_i] = 0;
+		printScopeDummy[g_i] = 0;
 	}
 	
 	insert_node("env1", VEC4, 0, 0, U, 0, 0);
@@ -111,7 +112,7 @@ int main (int argc, char *argv[]) {
 	insert_node("gl_Material_Shininess", VEC4, 0, 0, U, 0, 0);
 	insert_node("gl_FragDepth", BOOL, 0, 0, R, 0, 0);
 	symbol_table(ast);
-	print_symbol_table(Head);
+//	print_symbol_table(Head);
 
 	int ret_semantic = semantic_check(ast);
 	if(ret_semantic == -1)

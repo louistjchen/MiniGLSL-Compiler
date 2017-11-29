@@ -13,7 +13,9 @@
 #define AST_H_ 1
 
 #include <stdarg.h>
-extern int sscope;
+
+extern long printScope;
+extern long printScopeDummy[255];
 // Dummy node just so everything compiles, create your own node/nodes
 //
 // The code provided below is an example ONLY. You can use/modify it,

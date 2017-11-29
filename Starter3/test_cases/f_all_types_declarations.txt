@@ -1,0 +1,14 @@
+{
+	int temp;
+	bool temp;
+	float temp;
+	ivec2 temp;
+	bvec2 temp;
+	vec2 temp;
+	ivec3 temp;
+	bvec3 temp;
+	vec3 temp;
+	ivec4 temp;
+	bvec4 temp;
+	vec4 temp;
+}

@@ -5,7 +5,8 @@ const int testint = 1;
  bool b = true;
  bool d = false;
  if(true){
- 	testint = 2;
+ 	/*testint = 2;*/     /*expect error because of const assignment*/
+	;
  }
 
  }

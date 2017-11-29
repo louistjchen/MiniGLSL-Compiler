@@ -13,10 +13,13 @@
 // Global variables
 L_node* Head = NULL;
 long Scope_num = 0;
+long Dummy_count = 0;
+long global_dummy_count[255];
+long Test_count[255];
 
 
 // Linked-list functions
-void insert_node(char* Name, int Type, long Line_num, long Scope, attr Attribution){
+void insert_node(char* Name, int Type, long Line_num, long Scope, attr Attribution, long Count, long Test){
 	// Creat a new list node for the variable, since we don't want to mess up the symbol table with AST tree nodes.
 	L_node* Cur;
 	Cur = (struct L_node*)malloc(sizeof (L_node));
@@ -27,6 +30,8 @@ void insert_node(char* Name, int Type, long Line_num, long Scope, attr Attributi
 	Cur->Line_num = Line_num;
 	Cur->Scope = Scope;
 	Cur->Attribution = (int)Attribution;
+	Cur->Count = Dummy_count;
+	Cur->Test = Test;
 	strcpy(Cur->Name, Name);
 	
 	// Like a stack, new nodes are pushed to the front of the list.
@@ -39,6 +44,62 @@ void insert_node(char* Name, int Type, long Line_num, long Scope, attr Attributi
 		Head = Cur;
 	}
 }
+
+char* print_type(char* Name, long Scope, int Line_num){
+	L_node* Cur;
+	Cur = Head;
+	int var_type = 0;
+	while(Cur != NULL){
+		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope <= Scope) && (Cur->Line_num <= Line_num)){
+			// At parent scope
+			if(Cur->Scope < Scope){
+				var_type = Cur->Type;
+			}
+			// At current scope
+			else if(Cur->Test == printScopeDummy[Scope]){
+				var_type = Cur->Type;
+				break;
+			}
+		}
+		Cur = Cur->Next;
+	}
+	if(var_type == 0){
+		printf("Error!\n");
+		return "ERROR";
+	}
+	switch (var_type){
+		case 100:
+			return "INT";
+		case 101:
+			return "IVEC2";
+		case 102:
+			return "IVEC3";
+		case 103:
+			return "IVEC4";
+		case 104:
+			return "FLOAT";
+		case 105:
+			return "VEC2";
+		case 106:
+			return "VEC3";
+		case 107:
+			return "VEC4";
+		case 108:
+			return "BOOL";
+		case 109:
+			return "BVEC2";
+		case 110:
+			return "BVEC3";
+		case 111:
+			return "BVEC4";
+		case 112:
+			return "FUNCTION";
+		default:
+			return "ERROR";
+	}
+	return "ERROR";
+}
+
 
 int get_attribution(char* Name){
 	L_node* Cur;
@@ -57,33 +118,62 @@ int get_attribution(char* Name){
 // Check if the ID is declared in the same Scope or parent scopes.
 int is_declared(char* Name, long Scope, long Line_num){
 	L_node* Cur;
-	
 	Cur = Head;
+	int Temp = 0;
 	while(Cur != NULL){
-		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope <= Scope)){
-			if(Cur->Line_num <= Line_num)
+		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope <= Scope) && (Cur->Line_num <= Line_num)){
+			// At parent scope
+			if(Cur->Scope < Scope){
+				Temp = Cur->Type;
+			}
+			// At current scope
+			else if(Cur->Test == global_dummy_count[Scope])
 				return Cur->Type;
 		}
-		else
-			Cur = Cur->Next;
+		Cur = Cur->Next;
 	}
+	if (Temp != 0)
+		return Temp;
 	return -1;
 }
 
 // This one is for checking declaration for same ID in the same scope. If declaration is not in the same scope, it is valid (shadowing).
 int is_existed(char* Name, long Scope, long Line_num){
 	L_node* Cur;
+	L_node* Temp;
 	
 	Cur = Head;
 	while(Cur != NULL){
-		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope == Scope)){
-			if(Cur->Line_num <= Line_num)
-				return Cur->Type;
-		}
-		else
-			Cur = Cur->Next;
+		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope == 0))
+			return Cur->Attribution;
+		Cur = Cur->Next;
 	}
-	return -1;
+	
+	Temp = NULL;
+	Cur = Head;
+	while(Cur != NULL){
+		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope == Scope))
+			if(Cur->Line_num == Line_num){
+				 Temp = Cur;
+				 break;
+			}
+		Cur = Cur->Next;
+	}
+	if(Temp == NULL)
+		return -1;
+	else{
+		Cur = Head;
+		while(Cur != NULL){
+			if(strcmp(Cur->Name, Temp->Name) == 0 && (Cur->Scope == Temp->Scope)){
+				if((Cur->Line_num < Temp->Line_num) && (Cur->Count == Temp->Count))
+					 return Cur->Type;
+			}
+			Cur = Cur->Next;
+		}
+		return -1;
+	}
+	printf("You should not get here, you are in trouble!\n");
+	return 1;
 }
 
 void print_symbol_table(L_node* List_head){
@@ -106,6 +196,8 @@ void symbol_table(node* ast){
 		case PROGRAM:
 			//Every time get into a new {}, the scope number should increase.
 			Scope_num ++;
+			Dummy_count ++;
+			Test_count[Scope_num]++;
 			symbol_table(ast->program.scope);
 			Scope_num --;
 			break;
@@ -129,14 +221,14 @@ void symbol_table(node* ast){
 			symbol_table(ast->declaration.type);
 			// Identifier is a Terminal and the name of a var, so we insert it into the symbol table
 			insert_node(ast->declaration.identifier, ast->declaration.type->type.type, 
-			ast->declaration.ln, Scope_num, N);
+			ast->declaration.ln, Scope_num, N, Dummy_count, Test_count[Scope_num]);
 			break;
 		
 		case DECLARATION_ASSIGN:
 			symbol_table(ast->declaration_assign.type);
 			
 			insert_node(ast->declaration_assign.identifier, ast->declaration_assign.type->type.type,
-			ast->declaration_assign.ln, Scope_num, N);
+			ast->declaration_assign.ln, Scope_num, N, Dummy_count, Test_count[Scope_num]);
 			
 			symbol_table(ast->declaration_assign.expression);
 			break;
@@ -146,7 +238,7 @@ void symbol_table(node* ast){
 			
 			insert_node(ast->declaration_assign_const.identifier, 
 			ast->declaration_assign_const.type->type.type,
-			ast->declaration_assign_const.ln, Scope_num, C);
+			ast->declaration_assign_const.ln, Scope_num, C, Dummy_count, Test_count[Scope_num]);
 			
 			symbol_table(ast->declaration_assign.expression);
 			break;
@@ -179,15 +271,15 @@ void symbol_table(node* ast){
 		case EXPRESSION_FUNC:
 			switch(ast->expression_func.function){
 				case 0:
-					insert_node("dp3", FUNCTION, ast->expression_func.ln, Scope_num, N);
+					insert_node("dp3", FUNCTION, ast->expression_func.ln, Scope_num, N, Dummy_count, Test_count[Scope_num]);
 				break;
 				
 				case 1:
-					insert_node("lit", FUNCTION, ast->expression_func.ln, Scope_num, N);
+					insert_node("lit", FUNCTION, ast->expression_func.ln, Scope_num, N, Dummy_count, Test_count[Scope_num]);
 				break;
 				
 				case 2:
-					insert_node("rsq", FUNCTION, ast->expression_func.ln, Scope_num, N);
+					insert_node("rsq", FUNCTION, ast->expression_func.ln, Scope_num, N, Dummy_count, Test_count[Scope_num]);
 				break;
 				
 				default:
