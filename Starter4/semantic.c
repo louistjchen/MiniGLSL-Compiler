@@ -1,14 +1,17 @@
 /*
- * * Louis Chen - 1000303502
+ * Louis Chen - 1000303502
  * Juntu Chen - 1000659799
-
+ *
  *
  *
  * */
 
 
+#include "common.h"
 #include "semantic.h"
 
+
+// local variables
 int scopesem = 0;
 
 

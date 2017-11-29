@@ -1,7 +1,7 @@
 /*
- * * Louis Chen - 1000303502
+ * Louis Chen - 1000303502
  * Juntu Chen - 1000659799
-
+ *
  *
  * */
 
@@ -21,8 +21,6 @@
 #define DEBUG_PRINT_TREE 0
 
 node *ast = NULL;
-long printScope = 0;
-long printScopeDummy[255];
 
 node *ast_allocate(node_kind kind, ...) {
 	va_list args;

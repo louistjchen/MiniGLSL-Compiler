@@ -1,21 +1,56 @@
 /*
- * * Louis Chen - 1000303502
+ * Louis Chen - 1000303502
  * Juntu Chen - 1000659799
-
+ *
  *
  *
  * */
 
 
-
+#include "common.h"
 #include "symbol.h"
 
 // Global variables
 L_node* Head = NULL;
-long Scope_num = 0;
+
+// local variables
 long Dummy_count = 0;
-long global_dummy_count[255];
-long Test_count[255];
+
+// initialize global variables
+void initGlobalVars() {
+
+	int i;
+	for(i = 0; i < 255; i++) {
+		global_dummy_count[i] = 0;
+		Test_count[i] = 0;
+		printScopeDummy[i] = 0;
+	}
+	return;
+}
+
+
+// wrapper function for inserting all predefined variables
+void insertPredefVars() {
+
+	insert_node("env1", VEC4, 0, 0, U, 0, 0);
+	insert_node("env2", VEC4, 0, 0, U, 0, 0);
+	insert_node("env3", VEC4, 0, 0, U, 0, 0);
+	insert_node("gl_FragColor", VEC4, 0, 0, R, 0, 0);
+	insert_node("gl_TexCoord", VEC4, 0, 0, A, 0, 0);
+	insert_node("gl_FragCoord", VEC4, 0, 0, R, 0, 0);
+	// insert gl_Color as outlined in handout "ARB_Fragment_Program"
+	insert_node("gl_Color", VEC4, 0, 0, A, 0, 0);
+	// insert gl_color to accommodate the variable name in phong.frag
+	insert_node("gl_color", VEC4, 0, 0, A, 0, 0);
+	insert_node("gl_Secondary", VEC4, 0, 0, A, 0, 0);
+	insert_node("gl_Light_Half", VEC4, 0, 0, U, 0, 0);
+	insert_node("gl_FogFragCoord", VEC4, 0, 0, A, 0, 0);
+	insert_node("gl_Light_Ambient", VEC4, 0, 0, U, 0, 0);
+	insert_node("gl_Material_Shininess", VEC4, 0, 0, U, 0, 0);
+	insert_node("gl_FragDepth", BOOL, 0, 0, R, 0, 0);
+
+	return;
+}
 
 
 // Linked-list functions

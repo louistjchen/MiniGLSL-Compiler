@@ -52,6 +52,13 @@ extern int dumpAST;
 extern int dumpSymbols;
 extern int dumpInstructions;
 
+extern long printScope;
+extern long printScopeDummy[255];
+extern long Scope_num;
+extern long global_dummy_count[255];
+extern long Test_count[255];
+
+
 
 
 

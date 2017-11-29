@@ -1,8 +1,8 @@
 /***********************************************************************
  * **YOUR GROUP INFO SHOULD GO HERE**
-  * Louis Chen - 1000303502
+ * Louis Chen - 1000303502
  * Juntu Chen - 1000659799
-*
+ *
  * globalvars.c
  *
  * CSC467 Project Compiler Shared Global Variables
@@ -48,8 +48,10 @@ int dumpInstructions;
  * **NOTE** If you need to add global variables for phases 1 to 4, add
  * them below this comment.
  **********************************************************************/
-
-
-
+long printScope = 0;
+long printScopeDummy[255];
+long Scope_num = 0;
+long global_dummy_count[255];
+long Test_count[255];
 
 

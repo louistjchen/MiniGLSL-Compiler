@@ -1,8 +1,8 @@
 /***********************************************************************
  * **YOUR GROUP INFO SHOULD GO HERE**
-  * Louis Chen - 1000303502
+ * Louis Chen - 1000303502
  * Juntu Chen - 1000659799
-*
+ *
  * compiler467.c
  *
  * This is the main driver program for the CSC467F course project
@@ -28,7 +28,7 @@
 #include "ast.h"
 #include "symbol.h"
 #include "semantic.h"
-//#include "codegen.h"
+#include "codegen.h"
 
 /***********************************************************************
  * Default values for various files. Note assumption that default files
@@ -60,6 +60,7 @@ extern int yyparse(void);
  * Main program for the Compiler
  **********************************************************************/
 int main (int argc, char *argv[]) {
+
   getOpts (argc, argv); /* Set up and apply command line options */
 
 /***********************************************************************
@@ -91,33 +92,16 @@ int main (int argc, char *argv[]) {
     return 0; // parse failed
   }
 
-	int g_i = 0;
-	for(g_i = 0; g_i < 255; g_i++){
-		global_dummy_count[g_i] = 0;
-		Test_count[g_i] = 0;
-		printScopeDummy[g_i] = 0;
-	}
-	
-	insert_node("env1", VEC4, 0, 0, U, 0, 0);
-	insert_node("env2", VEC4, 0, 0, U, 0, 0);
-	insert_node("env3", VEC4, 0, 0, U, 0, 0);
-	insert_node("gl_FragColor", VEC4, 0, 0, R, 0, 0);
-	insert_node("gl_TexCoord", VEC4, 0, 0, A, 0, 0);
-	insert_node("gl_FragCoord", VEC4, 0, 0, R, 0, 0);
-	insert_node("gl_Color", VEC4, 0, 0, A, 0, 0);
-	insert_node("gl_Secondary", VEC4, 0, 0, A, 0, 0);
-	insert_node("gl_Light_Half", VEC4, 0, 0, U, 0, 0);
-	insert_node("gl_FogFragCoord", VEC4, 0, 0, A, 0, 0);
-	insert_node("gl_Light_Ambient", VEC4, 0, 0, U, 0, 0);
-	insert_node("gl_Material_Shininess", VEC4, 0, 0, U, 0, 0);
-	insert_node("gl_FragDepth", BOOL, 0, 0, R, 0, 0);
-	symbol_table(ast);
-//	print_symbol_table(Head);
+  initGlobalVars();  
+  insertPredefVars();
+  symbol_table(ast);
+  //print_symbol_table(Head);
 
-	int ret_semantic = semantic_check(ast);
-	if(ret_semantic == -1)
-		printf("Semantic check failed\n");
-
+  int ret_semantic = semantic_check(ast);
+  if(ret_semantic == -1) {
+    printf("Semantic check failed\n");
+    errorOccurred = TRUE;
+  }
 
 /* Phase 3: Call the AST dumping routine if requested */
   if (dumpAST)
@@ -127,8 +111,8 @@ int main (int argc, char *argv[]) {
   if (errorOccurred)
     fprintf(outputFile,"Failed to compile\n");
   else 
-   // genCode(ast);
-    ;
+   genCode(ast);
+   
 /***********************************************************************
  * Post Compilation Cleanup
  **********************************************************************/

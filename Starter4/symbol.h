@@ -1,7 +1,7 @@
 /*
- * * Louis Chen - 1000303502
+ * Louis Chen - 1000303502
  * Juntu Chen - 1000659799
-
+ *
  *
  *
  * */
@@ -53,13 +53,10 @@ typedef struct L_node{
 
 
 extern L_node* Head;
-extern long Scope_num;
-extern long global_dummy_count[255];
-extern long Test_count[255];
-
-
 
 // Functions
+void initGlobalVars();
+void insertPredefVars();
 void insert_node(char* Name, int Type, long Line_num, long Scope, attr Attribution, long Count, long Test);
 int is_declared(char* Name, long Scope, long Line_num);
 void symbol_table(node* ast);
