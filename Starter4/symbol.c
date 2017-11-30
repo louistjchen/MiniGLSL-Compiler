@@ -449,3 +449,17 @@ void symbol_table(node* ast){
 			break;
 	}
 }
+
+
+void freeSymbolTable() {
+
+	L_node *temp = Head;
+	while(Head != NULL) {
+		temp = Head;
+		Head = Head->Next;
+		free(temp->Name);
+		free(temp);
+	}
+
+	return;
+}

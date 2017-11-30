@@ -122,6 +122,8 @@ int main (int argc, char *argv[]) {
 
 /* Make calls to any cleanup or finalization routines here. */
   ast_free(ast);
+  freeSymbolTable();
+  freeRegList();
 
   /* Clean up files if necessary */
   if (inputFile != DEFAULT_INPUT_FILE)

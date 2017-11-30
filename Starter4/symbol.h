@@ -64,6 +64,7 @@ void print_symbol_table(L_node* List_head);
 int get_attribution(char* Name);
 int is_existed(char* Name, long Scope, long Line_num);
 const char* print_type(char* Name, long Scope, int Line_num);
+void freeSymbolTable();
 
 
 #endif
