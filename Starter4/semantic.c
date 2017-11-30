@@ -240,7 +240,7 @@ int semantic_check( node *ast) {
 			if(ret < 0) return -1;
 			else if(ret2 < 0) return -1;
 
-			temp = is_declared( ast->statement_assign.variable->variable.identifier , scopesem, ast->statement_assign.ln);
+			temp = is_declared(ast->statement_assign.variable);
 			if(temp < 0) {
 				printf("Semantic error (statement_assign variable name not declared) occurs at line %d\n", ast->statement_assign.ln);
 				return -1;
@@ -623,7 +623,7 @@ int semantic_check( node *ast) {
 			return semantic_check(ast->expression_variable.variable);			
 			break;
 		case VARIABLE:
-			ret = is_declared(ast->variable.identifier, scopesem, ast->variable.ln);
+			ret = is_declared(ast);
 			if(ret < 0) {
 				printf("Semantic error (variable not declared) occurs at line %d\n", ast->variable.ln);
 				return -1;
@@ -632,7 +632,7 @@ int semantic_check( node *ast) {
 				return ret;
 			break;
 		case ARRAY:
-			ret = is_declared(ast->array.identifier, scopesem, ast->array.ln);
+			ret = is_declared(ast);
 			if(ret < 0) {
 				printf("Semantic error (vector not declared) occurs at line %d\n", ast->array.ln);
 				return -1;

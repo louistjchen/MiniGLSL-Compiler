@@ -430,3 +430,179 @@ void ast_print(node * ast) {
   	}
 
 }
+
+
+void configScopeParent(node *astCurrent, node *astParent) {
+
+
+	if(astCurrent == NULL)
+		return;
+
+  	switch(astCurrent->kind) {
+
+		case PROGRAM:
+			configScope++;
+			configScopeCount[configScope]++;
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			configScopeParent(astCurrent->program.scope, astCurrent);
+			configScope--;
+			break;
+		case SCOPE:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			configScopeParent(astCurrent->scope.declarations, astCurrent);
+			configScopeParent(astCurrent->scope.statements, astCurrent);
+			break;
+		case DECLARATIONS:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			configScopeParent(astCurrent->declarations.declarations, astCurrent);
+			configScopeParent(astCurrent->declarations.declaration, astCurrent);
+			break;
+		case STATEMENTS:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			configScopeParent(astCurrent->statements.statements, astCurrent);
+			configScopeParent(astCurrent->statements.statement, astCurrent);
+			break;
+		case DECLARATION:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			configScopeParent(astCurrent->declaration.type, astCurrent);
+			break;
+		case DECLARATION_ASSIGN:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			configScopeParent(astCurrent->declaration_assign.type, astCurrent);
+			configScopeParent(astCurrent->declaration_assign.expression, astCurrent);
+			break;
+		case DECLARATION_ASSIGN_CONST:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			configScopeParent(astCurrent->declaration_assign_const.type, astCurrent);
+			configScopeParent(astCurrent->declaration_assign_const.expression, astCurrent);
+			break;
+		case STATEMENT_ASSIGN:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			configScopeParent(astCurrent->statement_assign.variable, astCurrent);
+			configScopeParent(astCurrent->statement_assign.expression, astCurrent);
+			break;
+		case STATEMENT_IF_ELSE:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			configScopeParent(astCurrent->statement_if_else.expression, astCurrent);
+			configScopeParent(astCurrent->statement_if_else.statement_valid, astCurrent);
+			configScopeParent(astCurrent->statement_if_else.statement_invalid, astCurrent);
+			break;
+		case STATEMENT_IF:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			configScopeParent(astCurrent->statement_if.expression, astCurrent);
+			configScopeParent(astCurrent->statement_if.statement_valid, astCurrent);
+			break;
+		case TYPE:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			break;
+		case EXPRESSION_TYPE:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			configScopeParent(astCurrent->expression_type.type, astCurrent);
+			configScopeParent(astCurrent->expression_type.arguments, astCurrent);
+			break;
+		case EXPRESSION_FUNC:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			configScopeParent(astCurrent->expression_func.arguments, astCurrent);
+			break;
+		case EXPRESSION_UNARY:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			configScopeParent(astCurrent->expression_unary.right, astCurrent);
+			break;
+		case EXPRESSION_BINARY:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			configScopeParent(astCurrent->expression_binary.left, astCurrent);
+			configScopeParent(astCurrent->expression_binary.right, astCurrent);
+			break;
+		case EXPRESSION_BOOL_VALUE:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			break;
+		case EXPRESSION_INT_VALUE:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			break;
+		case EXPRESSION_FLOAT_VALUE:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			break;
+		case EXPRESSION_BRACKET:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			configScopeParent(astCurrent->expression_bracket.expression, astCurrent);
+			break;
+		case EXPRESSION_VARIABLE:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			configScopeParent(astCurrent->expression_variable.variable, astCurrent);
+			break;
+		case VARIABLE:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			break;
+		case ARRAY:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			break;
+		case ARGUMENTS_MORE_THAN_ONE:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			configScopeParent(astCurrent->arguments_more_than_one.arguments_more_than_one, astCurrent);
+			configScopeParent(astCurrent->arguments_more_than_one.expression, astCurrent);
+			break;
+		case ARGUMENTS_ONLY_ONE:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			configScopeParent(astCurrent->arguments_only_one.expression, astCurrent);
+			break;
+		case ARGUMENTS_OPT:
+			astCurrent->scopeLevel = configScope;
+			astCurrent->scopeIndex = configScopeCount[configScope];
+			astCurrent->parent = astParent;
+			configScopeParent(astCurrent->arguments_opt.arguments, astCurrent);
+			break;
+		default:
+			printf("You should never come here!\n");
+			break;
+  	}
+
+	return;
+}

@@ -96,6 +96,11 @@ typedef enum {
 struct node_ {
 
 	node_kind kind;
+
+	int scopeLevel;
+	int scopeIndex;
+	struct node_ *parent;
+
 	union {
 		struct { node *scope; int ln; } program;
 		struct { node *declarations; node *statements; int ln; } scope;
@@ -128,5 +133,6 @@ struct node_ {
 node *ast_allocate(node_kind type, ...);
 void ast_free(node *ast);
 void ast_print(node * ast);
+void configScopeParent(node *astCurrent, node *astParent);
 
 #endif /* AST_H_ */

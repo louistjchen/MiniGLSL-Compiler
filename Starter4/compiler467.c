@@ -86,13 +86,16 @@ int main (int argc, char *argv[]) {
       break;
  */
 
+  // initialize global variables
+  initGlobalVars();
+
 /* Phase 2: Parser -- should allocate an AST, storing the reference in the
  * global variable "ast", and build the AST there. */
   if(1 == yyparse()) {
     return 0; // parse failed
   }
 
-  initGlobalVars();  
+  configScopeParent(ast, NULL);
   insertPredefVars();
   symbol_table(ast);
   //print_symbol_table(Head);

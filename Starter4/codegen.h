@@ -13,23 +13,16 @@
 #define __CODEGEN_H__ 1
 
 
+typedef struct regInfo_ {
 
+	char *name;
+	node *ast;
 
+} regInfo;
 
 
 void genCode(node *ast);
+int genCodeRecursion(node *ast);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-#endif	// __CODEGEN_H__
+#endif	/* __CODEGEN_H__ */

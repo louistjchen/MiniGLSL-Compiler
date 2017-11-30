@@ -48,6 +48,8 @@ int dumpInstructions;
  * **NOTE** If you need to add global variables for phases 1 to 4, add
  * them below this comment.
  **********************************************************************/
+long configScope = 0;
+long configScopeCount[255];
 long printScope = 0;
 long printScopeDummy[255];
 long Scope_num = 0;

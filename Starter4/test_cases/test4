@@ -1,12 +1,9 @@
 {
 	if(false) {
-		int a = 4;
+		float a;
 	}
 	else {
-
-		if(true) {
-			a = 1;
-		}
-	
-}
+		int a;
+		{a = 1;}
+	}
 }

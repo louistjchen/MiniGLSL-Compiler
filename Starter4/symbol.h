@@ -57,13 +57,13 @@ extern L_node* Head;
 // Functions
 void initGlobalVars();
 void insertPredefVars();
-void insert_node(char* Name, int Type, long Line_num, long Scope, attr Attribution, long Count, long Test);
-int is_declared(char* Name, long Scope, long Line_num);
+void insert_node(const char* Name, int Type, long Line_num, long Scope, attr Attribution, long Count, long Test);
+int is_declared(node *ast);
 void symbol_table(node* ast);
 void print_symbol_table(L_node* List_head);
 int get_attribution(char* Name);
 int is_existed(char* Name, long Scope, long Line_num);
-char* print_type(char* Name, long Scope, int Line_num);
+const char* print_type(char* Name, long Scope, int Line_num);
 
 
 #endif

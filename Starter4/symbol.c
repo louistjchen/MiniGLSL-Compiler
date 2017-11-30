@@ -21,6 +21,7 @@ void initGlobalVars() {
 
 	int i;
 	for(i = 0; i < 255; i++) {
+		configScopeCount[i] = 0;
 		global_dummy_count[i] = 0;
 		Test_count[i] = 0;
 		printScopeDummy[i] = 0;
@@ -38,10 +39,7 @@ void insertPredefVars() {
 	insert_node("gl_FragColor", VEC4, 0, 0, R, 0, 0);
 	insert_node("gl_TexCoord", VEC4, 0, 0, A, 0, 0);
 	insert_node("gl_FragCoord", VEC4, 0, 0, R, 0, 0);
-	// insert gl_Color as outlined in handout "ARB_Fragment_Program"
 	insert_node("gl_Color", VEC4, 0, 0, A, 0, 0);
-	// insert gl_color to accommodate the variable name in phong.frag
-	insert_node("gl_color", VEC4, 0, 0, A, 0, 0);
 	insert_node("gl_Secondary", VEC4, 0, 0, A, 0, 0);
 	insert_node("gl_Light_Half", VEC4, 0, 0, U, 0, 0);
 	insert_node("gl_FogFragCoord", VEC4, 0, 0, A, 0, 0);
@@ -54,7 +52,7 @@ void insertPredefVars() {
 
 
 // Linked-list functions
-void insert_node(char* Name, int Type, long Line_num, long Scope, attr Attribution, long Count, long Test){
+void insert_node(const char* Name, int Type, long Line_num, long Scope, attr Attribution, long Count, long Test){
 	// Creat a new list node for the variable, since we don't want to mess up the symbol table with AST tree nodes.
 	L_node* Cur;
 	Cur = (struct L_node*)malloc(sizeof (L_node));
@@ -80,7 +78,7 @@ void insert_node(char* Name, int Type, long Line_num, long Scope, attr Attributi
 	}
 }
 
-char* print_type(char* Name, long Scope, int Line_num){
+const char* print_type(char* Name, long Scope, int Line_num){
 	L_node* Cur;
 	Cur = Head;
 	int var_type = 0;
@@ -150,27 +148,107 @@ int get_attribution(char* Name){
 	return -1;
 }
 
+
 // Check if the ID is declared in the same Scope or parent scopes.
-int is_declared(char* Name, long Scope, long Line_num){
-	L_node* Cur;
+int is_declared(node* ast){
+
+	L_node* Cur = NULL;
+	node* Temp = NULL;
+	L_node* Target = NULL;
+	
 	Cur = Head;
-	int Temp = 0;
-	while(Cur != NULL){
-		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope <= Scope) && (Cur->Line_num <= Line_num)){
-			// At parent scope
-			if(Cur->Scope < Scope){
-				Temp = Cur->Type;
+
+	if(ast->kind == VARIABLE) {
+	
+		// First, find the same name, parent/current scope, smaller ln number variable in symbol table.
+		while(Cur != NULL){
+			Temp = ast;
+			if((strcmp(Cur->Name, ast->variable.identifier)) == 0 && (Cur->Scope <= ast->scopeLevel) && (Cur->Line_num <= ast->variable.ln)){
+				// At parent Scopelevel
+				if(Cur->Scope < ast->scopeLevel){
+					// Find which parent node is that "parent"
+					while(Temp != NULL){
+						// Found the parent scope.
+						if(Cur->Scope == Temp->scopeLevel && Cur->Test == Temp->scopeIndex){
+							Target = Cur;
+							break;
+						}
+						Temp = Temp->parent;
+					}				
+				}
+			
+				// At the same Scopelevel
+				else if(Cur->Scope == ast->scopeLevel){
+					// Fouond the same level and same index
+					if(Cur->Test == ast->scopeIndex){
+						Target = Cur;
+					}
+				}
+				else{
+					printf("You shouldn't be here. Get out!\n");
+					return -1;
+				}	
 			}
-			// At current scope
-			else if(Cur->Test == global_dummy_count[Scope])
-				return Cur->Type;
+			if(Target != NULL)
+				break;
+			Cur = Cur->Next;
 		}
-		Cur = Cur->Next;
 	}
-	if (Temp != 0)
-		return Temp;
-	return -1;
+	else if(ast->kind == ARRAY) {
+	
+		// First, find the same name, parent/current scope, smaller ln number array in symbol table.
+		while(Cur != NULL){
+			Temp = ast;
+			if((strcmp(Cur->Name, ast->array.identifier)) == 0 && (Cur->Scope <= ast->scopeLevel) && (Cur->Line_num <= ast->array.ln)){
+				// At parent Scopelevel
+				if(Cur->Scope < ast->scopeLevel){
+					// Find which parent node is that "parent"
+					while(Temp != NULL){
+						// Found the parent scope.
+						if(Cur->Scope == Temp->scopeLevel && Cur->Test == Temp->scopeIndex){
+							Target = Cur;
+							break;
+						}
+						Temp = Temp->parent;
+					}				
+				}
+			
+				// At the same Scopelevel
+				else if(Cur->Scope == ast->scopeLevel){
+					// Fouond the same level and same index
+					if(Cur->Test == ast->scopeIndex){
+						Target = Cur;
+					}
+				}
+				else{
+					printf("You shouldn't be here. Get out!\n");
+					return -1;
+				}	
+			}
+			if(Target != NULL)
+				break;
+			Cur = Cur->Next;
+		}
+	}
+	else {	
+		printf("AST node is not a variable/array node.\n");
+		return -1;
+	}
+	
+	
+	if(Target == NULL)
+		return -1;
+	else
+		return Target->Type;
+		
 }
+
+
+
+
+
+
+
 
 // This one is for checking declaration for same ID in the same scope. If declaration is not in the same scope, it is valid (shadowing).
 int is_existed(char* Name, long Scope, long Line_num){
@@ -216,7 +294,7 @@ void print_symbol_table(L_node* List_head){
 	Temp = List_head;
 	int counter = 0;
 	while(Temp != NULL){
-		printf("Node %d - Name: %s, Attribution: %d, Value: %d, Type: %d, Ln: %ld, Scope: %ld \n", counter, Temp->Name, Temp->Attribution, Temp->Value, Temp->Type, Temp->Line_num, Temp->Scope);
+		printf("Node %d - Name: %s, Attribution: %d, Value: %d, Type: %d, Ln: %ld, ScopeLevel: %ld , ScopeIndex: %ld\n", counter, Temp->Name, Temp->Attribution, Temp->Value, Temp->Type, Temp->Line_num, Temp->Scope, Temp->Test);
 		counter ++;
 		Temp = Temp->Next;
 	}

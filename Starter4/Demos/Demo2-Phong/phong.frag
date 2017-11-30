@@ -1,5 +1,5 @@
 {
-   vec4 fCol = gl_color;
+   vec4 fCol = gl_Color;
    vec4 fTex = gl_TexCoord;
    vec4 eyeNorm;
    vec4 coeff;
