@@ -223,7 +223,7 @@ expression
       { yTRACE("expression -> FUNC ( arguments_opt ) \n");
 	$$ = ast_allocate(EXPRESSION_FUNC, $1, $3, yyline); }
 
-  /* unary opterators */
+  /* unary operators */
   | '-' expression %prec UMINUS
       { yTRACE("expression -> - expression \n");
 	$$ = ast_allocate(EXPRESSION_UNARY, UNARY_NEGATIVE, $2, yyline); }

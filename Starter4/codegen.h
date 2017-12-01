@@ -24,10 +24,15 @@ typedef struct regInfo_ {
 	char regNameZ[MAX_NAME_SIZE];		// index = 2
 	char regNameW[MAX_NAME_SIZE];		// index = 3
 
-	// input information
-	char varName[MAX_NAME_SIZE];
+	// input information - variable/vector search
+	char varName[MAX_NAME_SIZE];		// predefined & variable - variable name
+						// expression - "__EXPRESSION__"
 	int scopeLevel;
 	int scopeIndex;
+
+	// input information - expression search
+	node *ast;				// predefined & variable - NULL
+						// expression - its ast
 
 	// next regInfo pointer
 	struct regInfo_ *next;
@@ -36,12 +41,14 @@ typedef struct regInfo_ {
 
 void initRegList();
 void insertPredefRegList(const char *name);
-void insertRegList(char *varName, int scopeLevel, int scopeIndex);
-char *searchRegList(char *varName, int index, int scopeLevel, int scopeIndex);
+char *insertVarRegList(char *varName, int scopeLevel, int scopeIndex);
+char *insertExpRegList(node *ast);
+char *searchVarRegList(node *ast, int index);
+char *searchExpRegList(node *ast);
 void freeRegList();
 
 void genCode(node *ast);
-int genCodeRecursion(node *ast);
+void genCodeRecursion(node *ast);
 
 
 #endif	/* __CODEGEN_H__ */

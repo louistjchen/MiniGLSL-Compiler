@@ -14,7 +14,10 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "common.h"
 #include "ast.h"
+#include "symbol.h"
+#include "semantic.h"
 #include "codegen.h"
 
 
@@ -87,6 +90,7 @@ void insertPredefRegList(const char *name) {
 	sprintf(temp->varName, "%s", name);
 	temp->scopeLevel = 0;
 	temp->scopeIndex = 0;
+	temp->ast = NULL;
 
 	temp->next = regList;
 	regList = temp;
@@ -95,39 +99,179 @@ void insertPredefRegList(const char *name) {
 }
 
 
-/* insert varName into regList and initialize their rX/scopeLevel/scopeIndex/next */
-void insertRegList(char *varName, int scopeLevel, int scopeIndex) {
+/* create a regInfo for a variable in regList and initialize its information */
+char *insertVarRegList(char *varName, int scopeLevel, int scopeIndex) {
 
 	regInfo *temp = (regInfo *)malloc(sizeof(regInfo));
-	unsigned int regNo = regNum++;
+	unsigned int regNo;
 
 	if(temp == NULL) {
-		printf("Predefined variable's regInfo allocation has failed.\n");
-		return;
+		printf("Variable's regInfo allocation has failed.\n");
+		return NULL;
 	}
 
-	sprintf(temp->regName, "r%u", regNo);
-	sprintf(temp->regNameX, "r%u.x", regNo);
-	sprintf(temp->regNameY, "r%u.y", regNo);
-	sprintf(temp->regNameZ, "r%u.z", regNo);
-	sprintf(temp->regNameW, "r%u.w", regNo);
+	regNo = regNum++;
+
+	sprintf(temp->regName, "r%uvar", regNo);
+	sprintf(temp->regNameX, "r%uvar.x", regNo);
+	sprintf(temp->regNameY, "r%uvar.y", regNo);
+	sprintf(temp->regNameZ, "r%uvar.z", regNo);
+	sprintf(temp->regNameW, "r%uvar.w", regNo);
 
 	sprintf(temp->varName, "%s", varName);
 	temp->scopeLevel = scopeLevel;
 	temp->scopeIndex = scopeIndex;
+	temp->ast = NULL;
 
 	temp->next = regList;
 	regList = temp;
 
-	return;
+	return temp->regName;
 }
 
 
-/* search varName inside regList. exist ? regName : NULL */
-char *searchRegList(char *varName, int index, int scopeLevel, int scopeIndex) {
+/* create a regInfo for an expression in regList and initialize its information */
+char *insertExpRegList(node *ast) {
+
+	regInfo *temp = (regInfo *)malloc(sizeof(regInfo));
+	unsigned int regNo;
+
+	if(temp == NULL) {
+		printf("Expression's regInfo allocation has failed.\n");
+		return NULL;
+	}
+
+	regNo = regNum++;
+
+	sprintf(temp->regName, "r%utmp", regNo);
+	sprintf(temp->regNameX, "r%utmp.x", regNo);
+	sprintf(temp->regNameY, "r%utmp.y", regNo);
+	sprintf(temp->regNameZ, "r%utmp.z", regNo);
+	sprintf(temp->regNameW, "r%utmp.w", regNo);
+
+	sprintf(temp->varName, "__EXPRESSION__");
+	temp->scopeLevel = ast->scopeLevel;
+	temp->scopeIndex = ast->scopeIndex;
+	temp->ast = ast;
+
+	temp->next = regList;
+	regList = temp;
+
+	return temp->regName;
+}
+
+
+/* search varName inside regList. EXIST ? regName : NULL */
+char *searchVarRegList(node *ast, int index) {
 
 	regInfo *temp = regList;
 	regInfo *found = NULL;
+
+	char *varName;
+	int scopeLevel;
+	int scopeIndex;
+
+	L_node* Cur = NULL;
+	node* Temp = NULL;
+	L_node* Target = NULL;
+	
+	Cur = Head;
+
+	if(ast->kind == VARIABLE) {
+	
+		// First, find the same name, parent/current scope, smaller ln number variable in symbol table.
+		while(Cur != NULL){
+			Temp = ast;
+			if((strcmp(Cur->Name, ast->variable.identifier)) == 0 && (Cur->Scope <= ast->scopeLevel) && (Cur->Line_num <= ast->variable.ln)){
+				// At parent Scopelevel
+				if(Cur->Scope < ast->scopeLevel){
+					// Find which parent node is that "parent"
+					while(Temp != NULL){
+						// Found the parent scope.
+						if(Cur->Scope == Temp->scopeLevel && Cur->Test == Temp->scopeIndex){
+							Target = Cur;
+							break;
+						}
+						Temp = Temp->parent;
+					}				
+				}
+			
+				// At the same Scopelevel
+				else if(Cur->Scope == ast->scopeLevel){
+					// Fouond the same level and same index
+					if(Cur->Test == ast->scopeIndex){
+						Target = Cur;
+					}
+				}
+				else{
+					printf("You shouldn't be here. Get out!\n");
+					return NULL;
+				}	
+			}
+			if(Target != NULL)
+				break;
+			Cur = Cur->Next;
+		}
+	}
+	else if(ast->kind == ARRAY) {
+	
+		// First, find the same name, parent/current scope, smaller ln number array in symbol table.
+		while(Cur != NULL){
+			Temp = ast;
+			if((strcmp(Cur->Name, ast->array.identifier)) == 0 && (Cur->Scope <= ast->scopeLevel) && (Cur->Line_num <= ast->array.ln)){
+				// At parent Scopelevel
+				if(Cur->Scope < ast->scopeLevel){
+					// Find which parent node is that "parent"
+					while(Temp != NULL){
+						// Found the parent scope.
+						if(Cur->Scope == Temp->scopeLevel && Cur->Test == Temp->scopeIndex){
+							Target = Cur;
+							break;
+						}
+						Temp = Temp->parent;
+					}				
+				}
+			
+				// At the same Scopelevel
+				else if(Cur->Scope == ast->scopeLevel){
+					// Fouond the same level and same index
+					if(Cur->Test == ast->scopeIndex){
+						Target = Cur;
+					}
+				}
+				else{
+					printf("You shouldn't be here. Get out!\n");
+					return NULL;
+				}	
+			}
+			if(Target != NULL)
+				break;
+			Cur = Cur->Next;
+		}
+	}
+	else {	
+		printf("AST node is not a variable/array node.\n");
+		return NULL;
+	}
+
+	
+	if(Target == NULL) {
+		printf("Searching the regInfo that has correct scopeLevel/scopeIndex as the input variable. You should not be here!\n");
+		return NULL;
+	}
+	else {
+		scopeLevel = Target->Scope;
+		scopeIndex = Target->Test;
+	}
+
+	if(ast->kind == VARIABLE)
+		varName = ast->variable.identifier;
+	else if(ast->kind == ARRAY)
+		varName = ast->array.identifier;
+	else {
+		printf("Searching the regInfo that has correct scopeLevel/scopeIndex as the input variable. You should not be here!\n");
+		return NULL;
+	}
 
 	while(temp != NULL) {
 	
@@ -139,8 +283,10 @@ char *searchRegList(char *varName, int index, int scopeLevel, int scopeIndex) {
 			temp = temp->next;
 	}
 
-	if(found == NULL)
+	if(found == NULL) {
+		printf("Searching the regInfo that has correct scopeLevel/scopeIndex as the input variable. You should not be here!\n");
 		return NULL;
+	}
 	else
 		switch(index) {
 			case -1:	return found->regName;
@@ -151,6 +297,33 @@ char *searchRegList(char *varName, int index, int scopeLevel, int scopeIndex) {
 			default: 	printf("Input vector indexing exceeds 3. You should not be here!\n");
 					return NULL;
 		}
+}
+
+
+/* search expression given its ast inside regList. EXIST ? regName : NULL */
+char *searchExpRegList(node *ast) {
+
+	regInfo *temp = regList;
+	regInfo *found = NULL;
+
+	if(ast == NULL) {
+		printf("Function \"searchExpRegList\" has failed. Input ast pointer is set to NULL.\n");
+		return NULL;
+	}
+
+	while(temp != NULL) {
+		if(ast == temp->ast) {
+			found = temp;
+			break;
+		}
+		else
+			temp = temp->next;
+	}
+
+	if(found == NULL)
+		return NULL;
+	else
+		return found->regName;
 }
 
 
@@ -178,104 +351,294 @@ void genCode(node *ast) {
 		return;
 	}
 
-	// ast traverse, write instructions to file (start and end), might need dynamic allocation
-//	if(genCodeRecursion(ast) < 0)
-//		printf("Error when generating ARB code.\n");
+	// ast traverse, write instructions to file (start and end)
+	fprintf(fp, "!!ARBfp1.0\n\n");
+	genCodeRecursion(ast);
+	fprintf(fp, "\nEND\n");
 	
 	// file close
 	fclose(fp);
-
-
 
 	return;
 }
 
 
-int genCodeRecursion(node *ast) {
+void genCodeRecursion(node *ast) {
 
 	// declare some temp variables to store return values from recursions
-	int temp1, temp2;
+	char *tempReg1;
+	char *tempReg2;
+	char *tempReg3;
+	int numArgs;
+
+	// return when reaching empty node
+	if(ast == NULL)
+		return;
 
   	switch(ast->kind) {
 
 		case PROGRAM:
-			temp1 = genCodeRecursion(ast->program.scope);
-			return temp1;
-			break;
+			genCodeRecursion(ast->program.scope);
+			return;
 		case SCOPE:
-			temp1 = genCodeRecursion(ast->scope.declarations);
-			temp2 = genCodeRecursion(ast->scope.statements);
-			if(temp1 < 0) return -1;
-			else if(temp2 < 0) return -1;
-			else return 0;
-			break;
+			genCodeRecursion(ast->scope.declarations);
+			genCodeRecursion(ast->scope.statements);
+			return;
 		case DECLARATIONS:
-			temp1 = genCodeRecursion(ast->declarations.declarations);
-			temp2 = genCodeRecursion(ast->declarations.declaration);
-			if(temp1 < 0) return -1;
-			else if(temp2 < 0) return -1;
-			else return temp2;
-			break;
+			genCodeRecursion(ast->declarations.declarations);
+			genCodeRecursion(ast->declarations.declaration);
+			return;
 		case STATEMENTS:
-			temp1 = genCodeRecursion(ast->statements.statements);
-			temp2 = genCodeRecursion(ast->statements.statement);
-			if(temp1 < 0) return -1;
-			else if(temp2 < 0) return -1;
-			else return temp2;
-			break;
+			genCodeRecursion(ast->statements.statements);
+			genCodeRecursion(ast->statements.statement);
+			return;
 		case DECLARATION:
-			break;
+			tempReg1 = insertVarRegList(ast->declaration.identifier, ast->scopeLevel, ast->scopeIndex);
+			fprintf(fp, "TEMP %s;\n", tempReg1);
+			return;
 		case DECLARATION_ASSIGN:
-			break;
+			tempReg1 = insertVarRegList(ast->declaration_assign.identifier, ast->scopeLevel, ast->scopeIndex);
+			genCodeRecursion(ast->declaration_assign.expression);
+			tempReg2 = searchExpRegList(ast->declaration_assign.expression);
+			fprintf(fp, "TEMP %s;\n", tempReg1);
+			fprintf(fp, "MOV %s, %s;\n", tempReg1, tempReg2);
+			return;
 		case DECLARATION_ASSIGN_CONST:
-			break;
+			tempReg1 = insertVarRegList(ast->declaration_assign_const.identifier, ast->scopeLevel, ast->scopeIndex);
+			genCodeRecursion(ast->declaration_assign_const.expression);
+			tempReg2 = searchExpRegList(ast->declaration_assign_const.expression);
+			fprintf(fp, "PARAM %s = %s;\n", tempReg1, tempReg2);
+			return;
 		case STATEMENT_ASSIGN:
-			break;
-		case STATEMENT_IF_ELSE:
-			break;
-		case STATEMENT_IF:
-			break;
+			if(ast->statement_assign.variable->kind == VARIABLE)
+				tempReg1 = searchVarRegList(ast->statement_assign.variable, -1);
+			else if(ast->statement_assign.variable->kind == ARRAY)
+				tempReg1 = searchVarRegList(ast->statement_assign.variable, ast->statement_assign.variable->array.index);
+			else {
+				printf("Error: genCodeRecursion() case: STATEMENT_ASSIGN. You should not be here!\n");
+				return;
+			}
+			genCodeRecursion(ast->statement_assign.expression);
+			tempReg2 = searchExpRegList(ast->statement_assign.expression);
+			fprintf(fp, "MOV %s, %s;\n", tempReg1, tempReg2);
+			return;
+		case STATEMENT_IF_ELSE://
+			return;
+		case STATEMENT_IF://
+			return;
 		case TYPE:
-			break;
+			printf("Error: genCodeRecursion() case: TYPE. You should not be here!\n");
+			return;
 		case EXPRESSION_TYPE:
-			break;
+			tempReg1 = insertExpRegList(ast);
+			genCodeRecursion(ast->expression_type.arguments);
+			tempReg2 = searchExpRegList(ast->expression_type.arguments);
+			numArgs = numArguments(ast->expression_type.arguments);
+			switch(numArgs) {
+				case 1:
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "MOV %s.x, %s.x;\n", tempReg1, tempReg2);
+					break;
+				case 2:
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "MOV %s.x, %s.x;\n", tempReg1, tempReg2);
+					fprintf(fp, "MOV %s.y, %s.y;\n", tempReg1, tempReg2);
+					break;
+				case 3:
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "MOV %s.x, %s.x;\n", tempReg1, tempReg2);
+					fprintf(fp, "MOV %s.y, %s.y;\n", tempReg1, tempReg2);
+					fprintf(fp, "MOV %s.z, %s.z;\n", tempReg1, tempReg2);
+					break;
+				case 4:
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "MOV %s.x, %s.x;\n", tempReg1, tempReg2);
+					fprintf(fp, "MOV %s.y, %s.y;\n", tempReg1, tempReg2);
+					fprintf(fp, "MOV %s.z, %s.z;\n", tempReg1, tempReg2);
+					fprintf(fp, "MOV %s.w, %s.w;\n", tempReg1, tempReg2);
+					break;
+				default:
+					printf("Error: genCodeRecursion() case: EXPRESSION_TYPE. You should not be here!\n");
+					break;
+			}
+			return;
 		case EXPRESSION_FUNC:
-			break;
+			tempReg1 = insertExpRegList(ast);
+			genCodeRecursion(ast->expression_func.arguments);
+			tempReg2 = searchExpRegList(ast->expression_func.arguments);
+			switch(ast->expression_func.function) {
+				case 0: // DP3
+//					fprintf(fp, "TEMP %s;\n", tempReg1);
+//					fprintf(fp, "DP3 %s, %s, %s");
+					break;
+				case 1: // LIT
+					break;
+				case 2: // RSQ
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "RSQ %s, %s;\n", tempReg1, tempReg2);
+					break;
+				default:
+					printf("Error: genCodeRecursion() case: EXPRESSION_FUNC. You should not be here!\n");
+					break;
+			}
+			return;
 		case EXPRESSION_UNARY:
-			//regNum = regNext++;
-			//fprintf(fp, "TEMP r%d\n", regNum);
-			// to be completed
-
-			break;
+			tempReg1 = insertExpRegList(ast);
+			genCodeRecursion(ast->expression_unary.right);
+			tempReg2 = searchExpRegList(ast->expression_unary.right);
+			switch(ast->expression_unary.op) {
+				case UNARY_NEGATIVE: // for arithmetic
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "MUL %s, %s, -1.0;\n", tempReg1, tempReg2);
+					break;
+				case UNARY_EXCLAMATION: // for boolean
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "SUB %s, 1.0, %s;\n", tempReg1, tempReg2);
+					break;
+				default:
+					printf("Error: genCodeRecursion() case: EXPRESSION_UNARY. You should not be here!\n");
+					break;
+			}
+			return;
 		case EXPRESSION_BINARY:
-			break;
+			tempReg1 = insertExpRegList(ast);
+			genCodeRecursion(ast->expression_binary.left);
+			tempReg2 = searchExpRegList(ast->expression_binary.left);
+			genCodeRecursion(ast->expression_binary.right);
+			tempReg3 = searchExpRegList(ast->expression_binary.right);
+			switch(ast->expression_binary.op) {
+				case BINARY_AND:
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "MUL %s, %s, %s;\n", tempReg1, tempReg2, tempReg3);
+					break;
+				case BINARY_OR:
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "ADD %s, %s, %s;\n", tempReg1, tempReg2, tempReg3);
+					fprintf(fp, "SUB %s, %s, 1.0;\n", tempReg1, tempReg1);
+					fprintf(fp, "CMP %s, %s, {0.0, 0.0, 0.0, 0.0}, {1.0, 1.0, 1.0, 1.0};\n", tempReg1, tempReg1);
+					break;
+				case BINARY_EQ:
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "SUB %s, %s, %s;\n", tempReg1, tempReg2, tempReg3);
+					fprintf(fp, "SUB %s, %s, %s;\n", tempReg3, tempReg3, tempReg2);
+					fprintf(fp, "CMP %s, %s, {0.0, 0.0, 0.0, 0.0}, {1.0, 1.0, 1.0, 1.0};\n", tempReg2, tempReg1);
+					fprintf(fp, "CMP %s, %s, {0.0, 0.0, 0.0, 0.0}, {1.0, 1.0, 1.0, 1.0};\n", tempReg3, tempReg3);
+					fprintf(fp, "MUL %s, %s, %s;\n", tempReg1, tempReg2, tempReg3);
+					break;
+				case BINARY_NEQ:
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "SUB %s, %s, %s;\n", tempReg1, tempReg2, tempReg3);
+					fprintf(fp, "SUB %s, %s, %s;\n", tempReg3, tempReg3, tempReg2);
+					fprintf(fp, "CMP %s, %s, {1.0, 1.0, 1.0, 1.0}, {0.0, 0.0, 0.0, 0.0};\n", tempReg2, tempReg1);
+					fprintf(fp, "CMP %s, %s, {1.0, 1.0, 1.0, 1.0}, {0.0, 0.0, 0.0, 0.0};\n", tempReg2, tempReg2);
+					fprintf(fp, "MUL %s, %s, %s;\n", tempReg1, tempReg2, tempReg3);
+					break;
+				case BINARY_LT:
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "SUB %s, %s, %s;\n", tempReg1, tempReg2, tempReg3);
+					fprintf(fp, "CMP %s, %s, {1.0, 1.0, 1.0, 1.0}, {0.0, 0.0, 0.0, 0.0};\n", tempReg1, tempReg1);
+					break;
+				case BINARY_LEQ:
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "SUB %s, %s, %s;\n", tempReg1, tempReg3, tempReg2);
+					fprintf(fp, "CMP %s, %s, {0.0, 0.0, 0.0, 0.0}, {1.0, 1.0, 1.0, 1.0};\n", tempReg1, tempReg1);
+					break;
+				case BINARY_GT:
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "SUB %s, %s, %s;\n", tempReg1, tempReg3, tempReg2);
+					fprintf(fp, "CMP %s, %s, {1.0, 1.0, 1.0, 1.0}, {0.0, 0.0, 0.0, 0.0};\n", tempReg1, tempReg1);
+					break;
+				case BINARY_GEQ:
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "SUB %s, %s, %s;\n", tempReg1, tempReg2, tempReg3);
+					fprintf(fp, "CMP %s, %s, {0.0, 0.0, 0.0, 0.0}, {1.0, 1.0, 1.0, 1.0};\n", tempReg1, tempReg1);
+					break;
+				case BINARY_PLUS:
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "ADD %s, %s, %s;\n", tempReg1, tempReg2, tempReg3);
+					break;
+				case BINARY_MINUS:
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "SUB %s, %s, %s;\n", tempReg1, tempReg2, tempReg3);
+					break;
+				case BINARY_TIMES:
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "MUL %s, %s, %s;\n", tempReg1, tempReg2, tempReg3);
+					break;
+				case BINARY_DIVIDE:
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "RCP %s, %s;\n", tempReg3, tempReg3);
+					fprintf(fp, "MUL %s, %s, %s;\n", tempReg1, tempReg2, tempReg3);
+					break;
+				case BINARY_XOR: // should be power rather than xor
+					fprintf(fp, "TEMP %s;\n", tempReg1);
+					fprintf(fp, "POW %s, %s, %s;\n", tempReg1, tempReg2, tempReg3);
+					break;
+				default:
+					printf("Error: genCodeRecursion() case: EXPRESSION_BINARY. You should not be here!\n");
+					break;
+			}
+			return;
 		case EXPRESSION_BOOL_VALUE:
-			break;
+			tempReg1 = insertExpRegList(ast);
+			fprintf(fp, "TEMP %s;\n", tempReg1);
+			fprintf(fp, "MOV %s, {%d.0, %d.0, %d.0, %d.0};\n", tempReg1, ast->expression_bool_value.bool_value, ast->expression_bool_value.bool_value, ast->expression_bool_value.bool_value, ast->expression_bool_value.bool_value);
+			return;
 		case EXPRESSION_INT_VALUE:
-			break;
+			tempReg1 = insertExpRegList(ast);
+			fprintf(fp, "TEMP %s;\n", tempReg1);
+			fprintf(fp, "MOV %s, {%d.0, %d.0, %d.0, %d.0};\n", tempReg1, ast->expression_int_value.int_value, ast->expression_int_value.int_value, ast->expression_int_value.int_value, ast->expression_int_value.int_value);
+			return;
 		case EXPRESSION_FLOAT_VALUE:
-			break;
+			tempReg1 = insertExpRegList(ast);
+			fprintf(fp, "TEMP %s;\n", tempReg1);
+			fprintf(fp, "MOV %s, {%f, %f, %f, %f};\n", tempReg1, ast->expression_float_value.float_value, ast->expression_float_value.float_value, ast->expression_float_value.float_value, ast->expression_float_value.float_value);
+			return;
 		case EXPRESSION_BRACKET:
-			temp1 = genCodeRecursion(ast->expression_bracket.expression);
-			return temp1;
-			break;
+			tempReg1 = insertExpRegList(ast);
+			genCodeRecursion(ast->expression_bracket.expression);
+			tempReg2 = searchExpRegList(ast->expression_bracket.expression);
+			fprintf(fp, "TEMP %s;\n", tempReg1);
+			fprintf(fp, "MOV %s, %s;\n", tempReg1, tempReg2);
+			return;
 		case EXPRESSION_VARIABLE:
-			break;
+			tempReg1 = insertExpRegList(ast);
+			genCodeRecursion(ast->expression_variable.variable);
+			tempReg2 = searchExpRegList(ast->expression_variable.variable);
+			fprintf(fp, "TEMP %s;\n", tempReg1);
+			fprintf(fp, "MOV %s, %s;\n", tempReg1, tempReg2);
+			return;
 		case VARIABLE:
-			break;
+			tempReg1 = insertExpRegList(ast);
+			tempReg2 = searchVarRegList(ast, -1);
+			fprintf(fp, "TEMP %s;\n", tempReg1);
+			fprintf(fp, "MOV %s, %s;\n", tempReg1, tempReg2);
+			return;
 		case ARRAY:
-			break;
-		case ARGUMENTS_MORE_THAN_ONE:
-			break;
+			tempReg1 = insertExpRegList(ast);
+			tempReg2 = searchVarRegList(ast, ast->array.index);
+			fprintf(fp, "TEMP %s;\n", tempReg1);
+			fprintf(fp, "MOV %s, %s;\n", tempReg1, tempReg2);
+			return;
+		case ARGUMENTS_MORE_THAN_ONE://
+			return;
 		case ARGUMENTS_ONLY_ONE:
-			break;
+			tempReg1 = insertExpRegList(ast);
+			genCodeRecursion(ast->arguments_only_one.expression);
+			tempReg2 = searchExpRegList(ast->arguments_only_one.expression);
+			fprintf(fp, "TEMP %s;\n", tempReg1);
+			fprintf(fp, "MOV %s, %s;\n", tempReg1, tempReg2);
+			return;
 		case ARGUMENTS_OPT:
-			break;
+			tempReg1 = insertExpRegList(ast);
+			genCodeRecursion(ast->arguments_opt.arguments);
+			tempReg2 = searchExpRegList(ast->arguments_opt.arguments);
+			fprintf(fp, "TEMP %s;\n", tempReg1);
+			fprintf(fp, "MOV %s, %s;\n", tempReg1, tempReg2);
+			return;
 		default:
-			break;
+			return;
   	}
 
-
-	// need modify
-	return -1;
+	return;
 }
