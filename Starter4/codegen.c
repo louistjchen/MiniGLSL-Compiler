@@ -344,8 +344,8 @@ void freeRegList() {
 void genCode(node *ast) {
 
 
-	// file create
-	fp = fopen("frag.txt", "w");
+	// copy file pointer; no need to close file as compiler.c does it
+	fp = outputFile;
 	if(fp == NULL) {
 		printf("Cannot open/create \"frag.txt\". Exit.\n");
 		return;
@@ -356,9 +356,6 @@ void genCode(node *ast) {
 	genCodeRecursion(ast);
 	fprintf(fp, "\nEND\n");
 	
-	// file close
-	fclose(fp);
-
 	return;
 }
 
