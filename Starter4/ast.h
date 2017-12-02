@@ -100,6 +100,7 @@ struct node_ {
 	int scopeLevel;
 	int scopeIndex;
 	struct node_ *parent;
+	char condReg[64];
 
 	union {
 		struct { node *scope; int ln; } program;

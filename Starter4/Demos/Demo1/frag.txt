@@ -1,22 +1,65 @@
 !!ARBfp1.0
-TEMP tempVar0;
-MOV tempVar0, {1.0,2.0,3.0,4.0};
-TEMP temp1;
-MOV temp1, tempVar0;
-MOV tempVar0, {1.0, 1.0, 1.0, 1.0};
-TEMP tempVar2;
-SUB tempVar2, {0.0, 0.0, 0.0, 0.0}, tempVar0;
-TEMP tempVar3;
-SUB tempVar3, tempVar0, {1.0, 1.0, 1.0, 1.0};
-MUL tempVar0, fragment.color.x, fragment.position.x;
-CMP temp1.x, tempVar2, tempVar0, temp1.x;
-MUL tempVar0, fragment.color.y, fragment.position.y;
-CMP temp1.y, tempVar2, tempVar0, temp1.y;
-CMP temp1.z, tempVar2, fragment.color.z, temp1.z;
-MUL tempVar0, fragment.color.w, fragment.position.x;
-TEMP tempVar7;
-MUL tempVar7, tempVar0, fragment.position.y;
-CMP temp1.w, tempVar2, tempVar7, temp1.w;
-CMP temp1, tempVar3, fragment.color, temp1;
-MOV result.color, temp1;
+
+#generating condition registers...
+TEMP cond_1_1;
+TEMP condBuf;
+MOV cond_1_1, {1.0, 1.0, 1.0, 1.0};
+TEMP r0tmp;
+MOV r0tmp, {1.0, 1.0, 1.0, 1.0};
+TEMP cond_2_1;
+MUL cond_2_1, cond_1_1, r0tmp;
+TEMP cond_2_2;
+SUB r0tmp, 1.0, r0tmp;
+MUL cond_2_2, cond_1_1, r0tmp;
+
+#generating ARB assembly code...
+TEMP r3tmp;
+MOV r3tmp, {4.000000, 4.000000, 4.000000, 4.000000};
+TEMP r4tmp;
+MOV r4tmp, {3.000000, 3.000000, 3.000000, 3.000000};
+TEMP r5tmp;
+MOV r5tmp, {2.000000, 2.000000, 2.000000, 2.000000};
+TEMP r6tmp;
+MOV r6tmp, {1.000000, 1.000000, 1.000000, 1.000000};
+TEMP r2tmp;
+MOV r2tmp.x, r6tmp;
+MOV r2tmp.y, r5tmp;
+MOV r2tmp.z, r4tmp;
+MOV r2tmp.w, r3tmp;
+TEMP r1var;
+MOV r1var, r2tmp;
+TEMP r8tmp;
+MOV r8tmp, fragment.color.x;
+TEMP r9tmp;
+MOV r9tmp, fragment.position.x;
+TEMP r7tmp;
+MUL r7tmp, r8tmp, r9tmp;
+SUB condBuf, cond_2_1, 1.0;
+CMP r1var.x, condBuf, r1var.x, r7tmp;
+TEMP r11tmp;
+MOV r11tmp, fragment.color.y;
+TEMP r12tmp;
+MOV r12tmp, fragment.position.y;
+TEMP r10tmp;
+MUL r10tmp, r11tmp, r12tmp;
+SUB condBuf, cond_2_1, 1.0;
+CMP r1var.y, condBuf, r1var.y, r10tmp;
+SUB condBuf, cond_2_1, 1.0;
+CMP r1var.z, condBuf, r1var.z, fragment.color.z;
+TEMP r15tmp;
+MOV r15tmp, fragment.color.w;
+TEMP r16tmp;
+MOV r16tmp, fragment.position.x;
+TEMP r14tmp;
+MUL r14tmp, r15tmp, r16tmp;
+TEMP r17tmp;
+MOV r17tmp, fragment.position.y;
+TEMP r13tmp;
+MUL r13tmp, r14tmp, r17tmp;
+SUB condBuf, cond_2_1, 1.0;
+CMP r1var.w, condBuf, r1var.w, r13tmp;
+SUB condBuf, cond_2_2, 1.0;
+CMP r1var, condBuf, r1var, fragment.color;
+MOV result.color, r1var;
+
 END

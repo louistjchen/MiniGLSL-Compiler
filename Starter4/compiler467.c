@@ -97,6 +97,7 @@ int main (int argc, char *argv[]) {
 
   configScopeParent(ast, NULL);
   insertPredefVars();
+  initRegList();
   symbol_table(ast);
   //print_symbol_table(Head);
 

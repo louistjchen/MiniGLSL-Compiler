@@ -161,7 +161,7 @@ int is_declared(node* ast){
 	if(ast->kind == VARIABLE) {
 		
 		if(strcmp(ast->variable.identifier,"env1") == 0 || strcmp(ast->variable.identifier,"env2") == 0 || strcmp(ast->variable.identifier,"env3") == 0 || strcmp(ast->variable.identifier,"gl_FragColor") == 0 || strcmp(ast->variable.identifier,"gl_TexCoord") == 0 || strcmp(ast->variable.identifier,"gl_FragCoord") == 0 || strcmp(ast->variable.identifier,"gl_Color") == 0 || strcmp(ast->variable.identifier,"gl_Secondary") == 0 || strcmp(ast->variable.identifier,"gl_Light_Half") == 0 || strcmp(ast->variable.identifier,"gl_FogFragCoord") == 0 || strcmp(ast->variable.identifier,"gl_Light_Ambient") == 0 || strcmp(ast->variable.identifier,"gl_Material_Shininess") == 0)
-		    return 107;	
+			return 107;	
 		else if(strcmp(ast->variable.identifier,"gl_FragDepth") == 0)
 			return 108;
 
@@ -202,7 +202,7 @@ int is_declared(node* ast){
 	else if(ast->kind == ARRAY) {
 
 		if(strcmp(ast->array.identifier,"env1") == 0 || strcmp(ast->array.identifier,"env2") == 0 || strcmp(ast->array.identifier,"env3") == 0 || strcmp(ast->array.identifier,"gl_FragColor") == 0 || strcmp(ast->array.identifier,"gl_TexCoord") == 0 || strcmp(ast->array.identifier,"gl_FragCoord") == 0 || strcmp(ast->array.identifier,"gl_Color") == 0 || strcmp(ast->array.identifier,"gl_Secondary") == 0 || strcmp(ast->array.identifier,"gl_Light_Half") == 0 || strcmp(ast->array.identifier,"gl_FogFragCoord") == 0 || strcmp(ast->array.identifier,"gl_Light_Ambient") == 0 || strcmp(ast->array.identifier,"gl_Material_Shininess") == 0)
-		    return 107;	
+			return 107;	
 		else if(strcmp(ast->array.identifier,"gl_FragDepth") == 0)
 			return 108;
 
@@ -268,7 +268,7 @@ int is_existed(char* Name, long Scope, long Line_num){
 	Cur = Head;
 	
 	if(strcmp(Name,"env1") == 0 || strcmp(Name,"env2") == 0 || strcmp(Name,"env3") == 0 || strcmp(Name,"gl_FragColor") == 0 || strcmp(Name,"gl_TexCoord") == 0 || strcmp(Name,"gl_FragCoord") == 0 || strcmp(Name,"gl_Color") == 0 || strcmp(Name,"gl_Secondary") == 0 || strcmp(Name,"gl_Light_Half") == 0 || strcmp(Name,"gl_FogFragCoord") == 0 || strcmp(Name,"gl_Light_Ambient") == 0 || strcmp(Name,"gl_Material_Shininess") == 0)
-		    return 107;	
+			return 107;	
 		else if(strcmp(Name,"gl_FragDepth") == 0)
 			return 108;
 

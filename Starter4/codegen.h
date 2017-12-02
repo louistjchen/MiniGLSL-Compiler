@@ -49,6 +49,6 @@ void freeRegList();
 
 void genCode(node *ast);
 void genCodeRecursion(node *ast);
-
+void genCondRecursion(node *ast);
 
 #endif	/* __CODEGEN_H__ */

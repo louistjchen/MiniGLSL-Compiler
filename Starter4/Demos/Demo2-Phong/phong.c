@@ -256,7 +256,7 @@ static void asciiKey (unsigned char key, int x, int y)
   
   if (key == 27) /* ESC */
     exit(0);
-  else if (key == 'F')
+  else if (key == 'P')
     menuChoice(cmdTogglePhong);
   else if (key == 'G')
     menuChoice(cmdToggleGeom);
@@ -414,7 +414,7 @@ int main (int argc, char * argv[])
   initApp();
   
   printf("\n");
-  printf("F toggles Phong shading\n");
+  printf("P toggles Phong shading\n");
   printf("G changes shape\n");
   printf("'Space' Start/Stop animation\n");
   printf("W change background to white\n");
