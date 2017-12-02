@@ -5,9 +5,6 @@
  *
  * */
 
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,6 +19,8 @@
 
 node *ast = NULL;
 
+
+/* Dynamically allocating a node for a given production rule, called by parser.y */
 node *ast_allocate(node_kind kind, ...) {
 	va_list args;
 
@@ -161,6 +160,8 @@ node *ast_allocate(node_kind kind, ...) {
   	return ast;
 }
 
+
+/* Freeing dynamically allocated AST tree in post-order traversal */
 void ast_free(node *ast) {
 
 	// base case
@@ -257,6 +258,8 @@ void ast_free(node *ast) {
 	ast = NULL;
 }
 
+
+/* Printing AST tree in pre-order traversal */
 void ast_print(node * ast) {
 
 	// base case
@@ -428,10 +431,10 @@ void ast_print(node * ast) {
 		default:
 			break;
   	}
-
 }
 
 
+/* Updating AST tree with parent node pointer and absolute scope number */
 void configScopeParent(node *astCurrent, node *astParent) {
 
 

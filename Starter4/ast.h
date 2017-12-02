@@ -2,10 +2,6 @@
  * Louis Chen - 1000303502
  * Juntu Chen - 1000659799
  *
- *
- *
- *
- *
  * */
 
 
@@ -97,9 +93,14 @@ struct node_ {
 
 	node_kind kind;
 
-	int scopeLevel;
-	int scopeIndex;
+	// for each node, we keep track of its absolute scope info
+	int scopeLevel; // scope depth
+	int scopeIndex; // parallel scope index for each scope depth
+
+	// we also keep track of each node's parent node pointer
 	struct node_ *parent;
+
+	// for each node we keep track of its condition register
 	char condReg[64];
 
 	union {

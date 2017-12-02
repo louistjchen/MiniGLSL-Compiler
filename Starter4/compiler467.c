@@ -86,23 +86,50 @@ int main (int argc, char *argv[]) {
       break;
  */
 
-  // initialize global variables
+  /* We initialize global variables listed in globalvars.c, extern-ed in common.h.
+   * These contain scope variables used for symbol table regeration, ast traversal,
+   * and some dummys. Please refer to "symbol.c" for details. */
   initGlobalVars();
 
 /* Phase 2: Parser -- should allocate an AST, storing the reference in the
  * global variable "ast", and build the AST there. */
-  if(1 == yyparse()) {
+  if (1 == yyparse())
     return 0; // parse failed
-  }
 
+  /* After AST is built, we implemented another AST traversal function called
+   * configScopeParent(node *ast, node *parentAst) to update our AST, so that
+   * every node has a backtrack pointer to its parent node. This is very useful
+   * as we use parent information in both semantic check and code generation
+   * stages. Please refer to "ast.c" for details. */
   configScopeParent(ast, NULL);
-  insertPredefVars();
-  initRegList();
-  symbol_table(ast);
-  //print_symbol_table(Head);
 
-  int ret_semantic = semantic_check(ast);
-  if(ret_semantic == -1) {
+  /* According to the specification of handout, there are several predefined
+   * variables, such as gl_Color, that cannot be re-declared. Therefore, we
+   * insert them into our symbol table corresponding information. Please refer
+   * to "symbol.c" for details. */
+  insertPredefVars();
+
+  /* After inserting predefined variables into symbol table, we now start to
+   * traverse AST and build up our symbol table, which will be containing
+   * the scope, type, variable name, etc information on all variables.
+   * Please refer to "symbol.c" for details. */
+  symbol_table(ast);
+
+  /* After symbol table is built, we initialize our register list, which will
+   * contain register name/info for all predefined variables, in a linked-list
+   * manner. Please refer to "codegen.c" for details. */
+  initRegList();
+
+  /* Dump symbol table if "-Ds" is included in the command. We could print this
+   * after semantic checking, but this is for symbol table debugging. Please
+   * refer to "symbol.c" for detailes. */
+  if (dumpSymbols)
+    print_symbol_table(Head);
+
+  /* Now that we have AST and symbol table built, we can start running semantic
+   * checking for the input code in a post-order traversal. Please refer to
+   * "semantic.c" for details. */
+  if (semantic_check(ast) == -1) {
     printf("Semantic check failed\n");
     errorOccurred = TRUE;
   }
@@ -120,12 +147,17 @@ int main (int argc, char *argv[]) {
     fprintf(outputFile,"Failed to compile\n");
   else 
    genCode(ast);
-   
+  
 /***********************************************************************
  * Post Compilation Cleanup
  **********************************************************************/
 
 /* Make calls to any cleanup or finalization routines here. */
+
+  /* Regardless whether the input code is compiled successfully or not, we
+   * need to free all dynamically allocated memories. These include AST
+   * tree, symbol table linked-list, and register linked-list. Please
+   * refer to "ast.c", "symbol.c", "codegen.c" for details. */
   ast_free(ast);
   freeSymbolTable();
   freeRegList();
@@ -212,7 +244,7 @@ void getOpts (int numargs, char **argstr) {
           }
           break;
         case 'O': /* Alternative output file */
-          printf("Blaaaaa\n");
+          printf("Alternative output file\n");
           if (optarg[2] == 0) {
             i += 1;
             outputFile = fileOpen (argstr[i], "w", DEFAULT_OUTPUT_FILE);
