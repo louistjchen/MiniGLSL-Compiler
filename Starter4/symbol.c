@@ -159,7 +159,12 @@ int is_declared(node* ast){
 	Cur = Head;
 
 	if(ast->kind == VARIABLE) {
-	
+		
+		if(strcmp(ast->variable.identifier,"env1") == 0 || strcmp(ast->variable.identifier,"env2") == 0 || strcmp(ast->variable.identifier,"env3") == 0 || strcmp(ast->variable.identifier,"gl_FragColor") == 0 || strcmp(ast->variable.identifier,"gl_TexCoord") == 0 || strcmp(ast->variable.identifier,"gl_FragCoord") == 0 || strcmp(ast->variable.identifier,"gl_Color") == 0 || strcmp(ast->variable.identifier,"gl_Secondary") == 0 || strcmp(ast->variable.identifier,"gl_Light_Half") == 0 || strcmp(ast->variable.identifier,"gl_FogFragCoord") == 0 || strcmp(ast->variable.identifier,"gl_Light_Ambient") == 0 || strcmp(ast->variable.identifier,"gl_Material_Shininess") == 0)
+		    return 107;	
+		else if(strcmp(ast->variable.identifier,"gl_FragDepth") == 0)
+			return 108;
+
 		// First, find the same name, parent/current scope, smaller ln number variable in symbol table.
 		while(Cur != NULL){
 			Temp = ast;
@@ -195,7 +200,12 @@ int is_declared(node* ast){
 		}
 	}
 	else if(ast->kind == ARRAY) {
-	
+
+		if(strcmp(ast->array.identifier,"env1") == 0 || strcmp(ast->array.identifier,"env2") == 0 || strcmp(ast->array.identifier,"env3") == 0 || strcmp(ast->array.identifier,"gl_FragColor") == 0 || strcmp(ast->array.identifier,"gl_TexCoord") == 0 || strcmp(ast->array.identifier,"gl_FragCoord") == 0 || strcmp(ast->array.identifier,"gl_Color") == 0 || strcmp(ast->array.identifier,"gl_Secondary") == 0 || strcmp(ast->array.identifier,"gl_Light_Half") == 0 || strcmp(ast->array.identifier,"gl_FogFragCoord") == 0 || strcmp(ast->array.identifier,"gl_Light_Ambient") == 0 || strcmp(ast->array.identifier,"gl_Material_Shininess") == 0)
+		    return 107;	
+		else if(strcmp(ast->array.identifier,"gl_FragDepth") == 0)
+			return 108;
+
 		// First, find the same name, parent/current scope, smaller ln number array in symbol table.
 		while(Cur != NULL){
 			Temp = ast;
@@ -256,6 +266,12 @@ int is_existed(char* Name, long Scope, long Line_num){
 	L_node* Temp;
 	
 	Cur = Head;
+	
+	if(strcmp(Name,"env1") == 0 || strcmp(Name,"env2") == 0 || strcmp(Name,"env3") == 0 || strcmp(Name,"gl_FragColor") == 0 || strcmp(Name,"gl_TexCoord") == 0 || strcmp(Name,"gl_FragCoord") == 0 || strcmp(Name,"gl_Color") == 0 || strcmp(Name,"gl_Secondary") == 0 || strcmp(Name,"gl_Light_Half") == 0 || strcmp(Name,"gl_FogFragCoord") == 0 || strcmp(Name,"gl_Light_Ambient") == 0 || strcmp(Name,"gl_Material_Shininess") == 0)
+		    return 107;	
+		else if(strcmp(Name,"gl_FragDepth") == 0)
+			return 108;
+
 	while(Cur != NULL){
 		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope == 0))
 			return Cur->Attribution;
@@ -272,6 +288,7 @@ int is_existed(char* Name, long Scope, long Line_num){
 			}
 		Cur = Cur->Next;
 	}
+	
 	if(Temp == NULL)
 		return -1;
 	else{
@@ -285,8 +302,6 @@ int is_existed(char* Name, long Scope, long Line_num){
 		}
 		return -1;
 	}
-	printf("You should not get here, you are in trouble!\n");
-	return 1;
 }
 
 void print_symbol_table(L_node* List_head){
