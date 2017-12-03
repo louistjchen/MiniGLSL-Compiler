@@ -39,6 +39,7 @@ typedef struct regInfo_ {
 
 } regInfo;
 
+/* function prototypes for register linked-list manipulation */
 void initRegList();
 void insertPredefRegList(const char *name);
 char *insertVarRegList(char *varName, int scopeLevel, int scopeIndex);
@@ -47,6 +48,7 @@ char *searchVarRegList(node *ast, int index);
 char *searchExpRegList(node *ast);
 void freeRegList();
 
+/* function prototypes for code generation */
 void genCode(node *ast);
 void genCodeRecursion(node *ast);
 void genCondRecursion(node *ast);

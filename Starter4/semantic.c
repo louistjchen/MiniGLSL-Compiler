@@ -15,6 +15,7 @@
 int scopesem = 0;
 
 
+/* semantic check, considering all kinds of rules specified by the lab handout */
 int semantic_check( node *ast) {
 
 	// base case, return -1

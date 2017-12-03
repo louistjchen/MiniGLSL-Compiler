@@ -161,7 +161,7 @@ char *insertExpRegList(node *ast) {
 }
 
 
-/* search varName inside regList. EXIST ? regName : NULL */
+/* search varName inside regList. EXIST ? regName : NULL. Note this returns the real register for the given variable */
 char *searchVarRegList(node *ast, int index) {
 
 	regInfo *temp = regList;
@@ -325,7 +325,7 @@ foundSymbolEntry:
 }
 
 
-/* search expression given its ast inside regList. EXIST ? regName : NULL */
+/* search expression given its ast inside regList. EXIST ? regName : NULL. Note this returns the wrapper register of the given expression. If this expression were a variable expression, then it will return the real register for the variable. If not, it will return the wrapper register. */
 char *searchExpRegList(node *ast) {
 
 	regInfo *temp = regList;
@@ -366,34 +366,42 @@ void freeRegList() {
 }
 
 
+/* Toplevel function for code generation */
 void genCode(node *ast) {
 
 
-	// copy file pointer; no need to close file as compiler.c does it
+	// copy file pointer; no need to close file as compiler467.c does it
 	fp = outputFile;
 	if(fp == NULL) {
 		printf("Cannot open/create \"frag.txt\". Exit.\n");
 		return;
 	}
 
-	// ast traverse, write instructions to file (start and end)
+	// print ARB assembly header
 	fprintf(fp, "!!ARBfp1.0\n\n");
 
+	// traverse AST and generate code for condition registers
+	// need to assign the root (program) condition register to true
+	// allocate a "condBuf" register for future condReg buffering
 	fprintf(fp, "#generating condition registers...\n");
 	sprintf(ast->condReg, "cond_%d_%d", ast->scopeLevel, ast->scopeIndex);
 	fprintf(fp, "TEMP %s;\n", ast->condReg);
 	fprintf(fp, "TEMP condBuf;\n");
-	fprintf(fp, "MOV %s, {1.0, 1.0, 1.0, 1.0};\n", ast->condReg); // assign program's cond to true (0.0)
+	fprintf(fp, "MOV %s, {1.0, 1.0, 1.0, 1.0};\n", ast->condReg);
 	genCondRecursion(ast);
 
+	// traverse AST and generate ARB assembly code
 	fprintf(fp, "\n#generating ARB assembly code...\n");
 	genCodeRecursion(ast);
+
+	// print ARB assembly footer
 	fprintf(fp, "\nEND\n");
 	
 	return;
 }
 
 
+/* Recursion function for code generation (post-order traversal) */
 void genCodeRecursion(node *ast) {
 
 	// declare some temp variables to store return values from recursions
@@ -448,6 +456,10 @@ void genCodeRecursion(node *ast) {
 				genCodeRecursion(ast->declaration_assign.expression);
 				tempReg2 = searchExpRegList(ast->declaration_assign.expression);
 			}
+
+			// Here we use current AST's condReg (condition register) to determine whether to assign or not
+			// if current scope is outermost, we simply use MOV
+			// else, we use CMP for assignment
 			fprintf(fp, "TEMP %s;\n", tempReg1);
 			if(ast->scopeLevel == 1 && ast->scopeIndex == 1)
 				fprintf(fp, "MOV %s, %s;\n", tempReg1, tempReg2);
@@ -476,6 +488,10 @@ void genCodeRecursion(node *ast) {
 			// due to our structure, need to use TEMP instead of PARAM for const
 			// however we have checked const during semantic check stage
 			//fprintf(fp, "PARAM %s = %s;\n", tempReg1, tempReg2);
+			
+			// Here we use current AST's condReg (condition register) to determine whether to assign or not
+			// if current scope is outermost, we simply use MOV
+			// else, we use CMP for assignment
 			fprintf(fp, "TEMP %s;\n", tempReg1);
 			if(ast->scopeLevel == 1 && ast->scopeIndex == 1)
 				fprintf(fp, "MOV %s, %s;\n", tempReg1, tempReg2);
@@ -509,6 +525,10 @@ void genCodeRecursion(node *ast) {
 				tempReg2 = searchExpRegList(ast->statement_assign.expression);
 			}
 
+			
+			// Here we use current AST's condReg (condition register) to determine whether to assign or not
+			// if current scope is outermost && current AST's parent is not a conditional statement, we simply use MOV. Need to know parent node kind to avoid assignment in ELSE without parentheses
+			// else, we use CMP for assignment
 			if(ast->scopeLevel == 1 && ast->scopeIndex == 1 && ast->parent->kind != STATEMENT_IF_ELSE && ast->parent->kind != STATEMENT_IF)
 				fprintf(fp, "MOV %s, %s;\n", tempReg1, tempReg2);
 			else {
@@ -527,6 +547,8 @@ void genCodeRecursion(node *ast) {
 			printf("Error: genCodeRecursion() case: TYPE. You should not be here!\n");
 			return;
 		case EXPRESSION_TYPE:
+			// input arguments at most 4 element
+			// we bruteforce to get at most 4 ast pointers that point to all arguments
 			tempReg1 = insertExpRegList(ast);
 
 			tempAst = ast->expression_type.arguments;
@@ -601,6 +623,8 @@ void genCodeRecursion(node *ast) {
 			free(tempRegs);
 			return;
 		case EXPRESSION_FUNC:
+			// input arguments at most 2 elements, can be either scalar or vector
+			// we bruteforce to get at most 2 ast pointers that point to all arguments
 			tempReg1 = insertExpRegList(ast);
 
 			tempAst = ast->expression_type.arguments;
@@ -718,6 +742,7 @@ void genCodeRecursion(node *ast) {
 			}
 			return;
 		case EXPRESSION_BINARY:
+			// Here we determine the logical operations based on available ARB opcodes
 			tempReg1 = insertExpRegList(ast);
 			genCodeRecursion(ast->expression_binary.left);
 			tempReg2 = searchExpRegList(ast->expression_binary.left);
@@ -797,16 +822,19 @@ void genCodeRecursion(node *ast) {
 			}
 			return;
 		case EXPRESSION_BOOL_VALUE:
+			// we create a wrapper expression register that stores the bool value, in float type
 			tempReg1 = insertExpRegList(ast);
 			fprintf(fp, "TEMP %s;\n", tempReg1);
 			fprintf(fp, "MOV %s, {%d.0, %d.0, %d.0, %d.0};\n", tempReg1, ast->expression_bool_value.bool_value, ast->expression_bool_value.bool_value, ast->expression_bool_value.bool_value, ast->expression_bool_value.bool_value);
 			return;
 		case EXPRESSION_INT_VALUE:
+			// we create a wrapper expression register that stores the int value, in float type
 			tempReg1 = insertExpRegList(ast);
 			fprintf(fp, "TEMP %s;\n", tempReg1);
 			fprintf(fp, "MOV %s, {%d.0, %d.0, %d.0, %d.0};\n", tempReg1, ast->expression_int_value.int_value, ast->expression_int_value.int_value, ast->expression_int_value.int_value, ast->expression_int_value.int_value);
 			return;
 		case EXPRESSION_FLOAT_VALUE:
+			// we create a wrapper expression register that stores the float value
 			tempReg1 = insertExpRegList(ast);
 			fprintf(fp, "TEMP %s;\n", tempReg1);
 			fprintf(fp, "MOV %s, {%f, %f, %f, %f};\n", tempReg1, ast->expression_float_value.float_value, ast->expression_float_value.float_value, ast->expression_float_value.float_value, ast->expression_float_value.float_value);
@@ -819,6 +847,7 @@ void genCodeRecursion(node *ast) {
 			fprintf(fp, "MOV %s, %s;\n", tempReg1, tempReg2);
 			return;
 		case EXPRESSION_VARIABLE:
+			// we create a wrapper register and assign it to the corresponding variable's register
 			tempReg1 = insertExpRegList(ast);
 			// comment this out to avoid extra wrapper registers
 			// therefore we should never recursively go into VARIABLE/ARRAY
@@ -863,6 +892,7 @@ void genCodeRecursion(node *ast) {
 }
 
 
+/* Recursion function for condition register generation */
 void genCondRecursion(node *ast) {
 
 	char *tempReg1;
@@ -874,11 +904,13 @@ void genCondRecursion(node *ast) {
   	switch(ast->kind) {
 
 		case PROGRAM:
+			// assign condReg to child node
 			if(ast->program.scope != NULL)
 				sprintf(ast->program.scope->condReg, "%s", ast->condReg);
 			genCondRecursion(ast->program.scope);
 			return;
 		case SCOPE:
+			// assign condReg to child nodes
 			if(ast->scope.declarations != NULL)
 				sprintf(ast->scope.declarations->condReg, "%s", ast->condReg);
 			if(ast->scope.statements != NULL)
@@ -887,6 +919,7 @@ void genCondRecursion(node *ast) {
 			genCondRecursion(ast->scope.statements);
 			return;
 		case DECLARATIONS:
+			// assign condReg to child nodes
 			if(ast->declarations.declarations != NULL)
 				sprintf(ast->declarations.declarations->condReg, "%s", ast->condReg);
 			if(ast->declarations.declaration != NULL)
@@ -894,11 +927,13 @@ void genCondRecursion(node *ast) {
 			genCondRecursion(ast->declarations.declarations);
 			return;
 		case STATEMENTS:
+			// assign condReg to child nodes
 			if(ast->statements.statements != NULL)
 				sprintf(ast->statements.statements->condReg, "%s", ast->condReg);
 			if(ast->statements.statement != NULL)
 				sprintf(ast->statements.statement->condReg, "%s", ast->condReg);
 			genCondRecursion(ast->statements.statements);
+			// only run recursion if child is an if/if_else statement
 			if(ast->statements.statement->kind != STATEMENT_ASSIGN)
 				genCondRecursion(ast->statements.statement);
 			return;
@@ -915,15 +950,18 @@ void genCondRecursion(node *ast) {
 			printf("Error: genCondRecursion() case STATEMENT_ASSIGN. You should not be here!\n");
 			return;
 		case STATEMENT_IF_ELSE:
+			// 1) Run genCodeRecursion on expression to fetch its wrapper register
 			genCodeRecursion(ast->statement_if_else.expression);
 			tempReg1 = searchExpRegList(ast->statement_if_else.expression);
 
+			// 2) For IF, "AND" expression register with current AST's condReg and assign to statement_valid's condReg
 			if(ast->statement_if_else.statement_valid != NULL) {
 				sprintf(ast->statement_if_else.statement_valid->condReg, "cond_%d_%d", ast->statement_if_else.statement_valid->scopeLevel, ast->statement_if_else.statement_valid->scopeIndex);
 				fprintf(fp, "TEMP %s;\n", ast->statement_if_else.statement_valid->condReg);
 				fprintf(fp, "MUL %s, %s, %s;\n", ast->statement_if_else.statement_valid->condReg, ast->condReg, tempReg1);
 			}
 
+			// 3) For ELSE, "NOT" expression register, "AND" the result with current AST's condReg and assign to statement_invalid's condReg
 			if(ast->statement_if_else.statement_invalid != NULL) {
 				sprintf(ast->statement_if_else.statement_invalid->condReg, "cond_%d_%d", ast->statement_if_else.statement_invalid->scopeLevel, ast->statement_if_else.statement_invalid->scopeIndex);
 				fprintf(fp, "TEMP %s;\n", ast->statement_if_else.statement_invalid->condReg);
@@ -935,9 +973,11 @@ void genCondRecursion(node *ast) {
 			genCondRecursion(ast->statement_if_else.statement_invalid);
 			return;
 		case STATEMENT_IF:
+			// 1) Run genCodeRecursion on expression to fetch its wrapper register
 			genCodeRecursion(ast->statement_if.expression);
 			tempReg1 = searchExpRegList(ast->statement_if.expression);
 
+			// 2) For IF, "AND" expression register with current AST's condReg and assign to statement_valid's condReg
 			if(ast->statement_if.statement_valid != NULL) {
 				sprintf(ast->statement_if.statement_valid->condReg, "cond_%d_%d", ast->statement_if.statement_valid->scopeLevel, ast->statement_if.statement_valid->scopeIndex);
 				fprintf(fp, "TEMP %s;\n", ast->statement_if.statement_valid->condReg);
@@ -997,11 +1037,4 @@ void genCondRecursion(node *ast) {
   	}
 
 	return;
-
-
-
-
-
-
-
 }
