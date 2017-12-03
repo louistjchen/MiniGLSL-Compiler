@@ -30,7 +30,7 @@ void initGlobalVars() {
 }
 
 
-// wrapper function for inserting all predefined variables
+// Wrapper function for inserting all predefined variables
 void insertPredefVars() {
 
 	insert_node("env1", VEC4, 0, 0, U, 0, 0);
@@ -78,10 +78,12 @@ void insert_node(const char* Name, int Type, long Line_num, long Scope, attr Att
 	}
 }
 
+// Print variable types for ast-print
 const char* print_type(char* Name, long Scope, int Line_num){
 	L_node* Cur;
 	Cur = Head;
 	int var_type = 0;
+	// Traverse the symbol table and find the node.
 	while(Cur != NULL){
 		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope <= Scope) && (Cur->Line_num <= Line_num)){
 			// At parent scope
@@ -96,10 +98,12 @@ const char* print_type(char* Name, long Scope, int Line_num){
 		}
 		Cur = Cur->Next;
 	}
+	// At least one node should be found, if not, then it is an error.
 	if(var_type == 0){
 		printf("Error!\n");
 		return "ERROR";
 	}
+	// Return a string that contains the info of variable's type.
 	switch (var_type){
 		case 100:
 			return "INT";
@@ -133,7 +137,7 @@ const char* print_type(char* Name, long Scope, int Line_num){
 	return "ERROR";
 }
 
-
+// Function for getting attribute from pre-defined variables.
 int get_attribution(char* Name){
 	L_node* Cur;
 	
@@ -159,7 +163,7 @@ int is_declared(node* ast){
 	Cur = Head;
 
 	if(ast->kind == VARIABLE) {
-		
+		// Pre-defined variables will be return immediately since they must have been declared.
 		if(strcmp(ast->variable.identifier,"env1") == 0 || strcmp(ast->variable.identifier,"env2") == 0 || strcmp(ast->variable.identifier,"env3") == 0 || strcmp(ast->variable.identifier,"gl_FragColor") == 0 || strcmp(ast->variable.identifier,"gl_TexCoord") == 0 || strcmp(ast->variable.identifier,"gl_FragCoord") == 0 || strcmp(ast->variable.identifier,"gl_Color") == 0 || strcmp(ast->variable.identifier,"gl_Secondary") == 0 || strcmp(ast->variable.identifier,"gl_Light_Half") == 0 || strcmp(ast->variable.identifier,"gl_FogFragCoord") == 0 || strcmp(ast->variable.identifier,"gl_Light_Ambient") == 0 || strcmp(ast->variable.identifier,"gl_Material_Shininess") == 0)
 			return 107;	
 		else if(strcmp(ast->variable.identifier,"gl_FragDepth") == 0)
@@ -200,7 +204,7 @@ int is_declared(node* ast){
 		}
 	}
 	else if(ast->kind == ARRAY) {
-
+		// Pre-defined variables will be return immediately since they must have been declared.
 		if(strcmp(ast->array.identifier,"env1") == 0 || strcmp(ast->array.identifier,"env2") == 0 || strcmp(ast->array.identifier,"env3") == 0 || strcmp(ast->array.identifier,"gl_FragColor") == 0 || strcmp(ast->array.identifier,"gl_TexCoord") == 0 || strcmp(ast->array.identifier,"gl_FragCoord") == 0 || strcmp(ast->array.identifier,"gl_Color") == 0 || strcmp(ast->array.identifier,"gl_Secondary") == 0 || strcmp(ast->array.identifier,"gl_Light_Half") == 0 || strcmp(ast->array.identifier,"gl_FogFragCoord") == 0 || strcmp(ast->array.identifier,"gl_Light_Ambient") == 0 || strcmp(ast->array.identifier,"gl_Material_Shininess") == 0)
 			return 107;	
 		else if(strcmp(ast->array.identifier,"gl_FragDepth") == 0)
@@ -245,20 +249,13 @@ int is_declared(node* ast){
 		return -1;
 	}
 	
-	
+	// If the function found nothing in the symbol table, means this variable is never decleared at lines before where this function is called.
 	if(Target == NULL)
 		return -1;
 	else
 		return Target->Type;
 		
 }
-
-
-
-
-
-
-
 
 // This one is for checking declaration for same ID in the same scope. If declaration is not in the same scope, it is valid (shadowing).
 int is_existed(char* Name, long Scope, long Line_num){
@@ -267,17 +264,13 @@ int is_existed(char* Name, long Scope, long Line_num){
 	
 	Cur = Head;
 	
+	// Pre-defined variables will be return immediately since they must have been declared.
 	if(strcmp(Name,"env1") == 0 || strcmp(Name,"env2") == 0 || strcmp(Name,"env3") == 0 || strcmp(Name,"gl_FragColor") == 0 || strcmp(Name,"gl_TexCoord") == 0 || strcmp(Name,"gl_FragCoord") == 0 || strcmp(Name,"gl_Color") == 0 || strcmp(Name,"gl_Secondary") == 0 || strcmp(Name,"gl_Light_Half") == 0 || strcmp(Name,"gl_FogFragCoord") == 0 || strcmp(Name,"gl_Light_Ambient") == 0 || strcmp(Name,"gl_Material_Shininess") == 0)
 			return 107;	
 		else if(strcmp(Name,"gl_FragDepth") == 0)
 			return 108;
-
-	while(Cur != NULL){
-		if(strcmp(Cur->Name, Name) == 0 && (Cur->Scope == 0))
-			return Cur->Attribution;
-		Cur = Cur->Next;
-	}
-	
+			
+	// Find if the variable is declared at the same scope.
 	Temp = NULL;
 	Cur = Head;
 	while(Cur != NULL){
@@ -288,14 +281,15 @@ int is_existed(char* Name, long Scope, long Line_num){
 			}
 		Cur = Cur->Next;
 	}
-	
+	// Not found
 	if(Temp == NULL)
 		return -1;
 	else{
+		// Found in the same scopelevel, but need to verify if it is at the exactly same "SCOPE"(not only at the same scope level)
 		Cur = Head;
 		while(Cur != NULL){
 			if(strcmp(Cur->Name, Temp->Name) == 0 && (Cur->Scope == Temp->Scope)){
-				if((Cur->Line_num < Temp->Line_num) && (Cur->Count == Temp->Count))
+				if((Cur->Line_num < Temp->Line_num) && (Cur->Count == Temp->Count)) //Count is similar to the scopeIndex.
 					 return Cur->Type;
 			}
 			Cur = Cur->Next;
@@ -304,6 +298,7 @@ int is_existed(char* Name, long Scope, long Line_num){
 	}
 }
 
+// Printout the symbol table, for debugging purpose.
 void print_symbol_table(L_node* List_head){
 	L_node* Temp;
 	Temp = List_head;
@@ -315,6 +310,7 @@ void print_symbol_table(L_node* List_head){
 	}
 }
 
+// Symbol table construction
 void symbol_table(node* ast){
 
 	if (ast == NULL)
@@ -322,10 +318,9 @@ void symbol_table(node* ast){
 	
 	switch(ast->kind){
 		case PROGRAM:
-			//Every time get into a new {}, the scope number should increase.
-			Scope_num ++;
-			Dummy_count ++;
-			Test_count[Scope_num]++;
+			Scope_num ++;	// Every time get into a new {}, the scope number should increase.
+			Dummy_count ++; // This count acts as a scopeIndex, for is_existed function usage only. Its functionality actually can be replaced by the scopeLevel&scopeIndex structure. We keep this because is_existed is already implemented with this structure. 
+			Test_count[Scope_num]++; // This array stores scopeLevels and scopeIndexs in each level. This structure includes the functionality of "Dummy_count" structure.
 			symbol_table(ast->program.scope);
 			Scope_num --;
 			break;
@@ -465,7 +460,7 @@ void symbol_table(node* ast){
 	}
 }
 
-
+// Free the symbol table.
 void freeSymbolTable() {
 
 	L_node *temp = Head;

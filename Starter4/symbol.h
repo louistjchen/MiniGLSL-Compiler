@@ -39,6 +39,7 @@ typedef enum {
 	C = 904
 }attr;
 
+// Basic node struct of symbol table.
 typedef struct L_node{
 	char* Name;
 	int Attribution;
@@ -51,7 +52,7 @@ typedef struct L_node{
 	struct L_node* Next;
 }L_node;
 
-
+// The head of the whole symbol table structure.
 extern L_node* Head;
 
 // Functions
