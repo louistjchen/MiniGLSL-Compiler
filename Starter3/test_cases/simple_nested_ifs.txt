@@ -1,9 +1,0 @@
-{
-	int temp = 10;
-	if (true) {
-		temp = 10;
-		if (false) {
-			temp = 30;
-		}
-	}
-}
